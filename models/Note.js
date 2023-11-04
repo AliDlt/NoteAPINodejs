@@ -9,6 +9,7 @@ const noteSchmea = new mongoose.Schema({
   content: {
     type: String,
     required: true,
+    trim: true,
   },
   createdAt: {
     type: Date,
@@ -24,9 +25,12 @@ const noteSchmea = new mongoose.Schema({
       ref: "Todo",
     },
   ],
-  tags: {
-    type: [String],
-  },
+  tags: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tag",
+    },
+  ],
 });
 
 module.exports = mongoose.model("Note", noteSchmea);

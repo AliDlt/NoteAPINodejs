@@ -23,7 +23,13 @@ const createFolder = async (req, res) => {
     await folder.save();
     res.json("فولدر با موفقیت افزوده شد.");
   } catch (error) {
-    res.json(`خطایی به وجود آمده است : ${error}`);
+    if (error.code === 11000 && error.keyPattern.title) {
+      res
+        .status(400)
+        .json({ message: "فولدر با این عنوان قبلاً ایجاد شده است." });
+    } else {
+      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    }
   }
 };
 
@@ -42,7 +48,13 @@ const updateFolder = async (req, res) => {
     }
     res.json("فولدر با موفقیت آپدیت شد.");
   } catch (error) {
-    res.status(500).json(`خطایی به وجود آمده است: ${error}`);
+    if (error.code === 11000 && error.keyPattern.title) {
+      res
+        .status(400)
+        .json({ message: "فولدر با این عنوان قبلاً ایجاد شده است." });
+    } else {
+      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    }
   }
 };
 
@@ -50,8 +62,18 @@ const updateFolder = async (req, res) => {
 const deleteFolder = async (req, res) => {
   try {
     const folderId = req.body.id;
+    const allNotesFolder = await Folder.findOne({ name: "All Notes" });
 
-    const deletedFolder = await Note.findByIdAndDelete(folderId);
+    if (
+      allNotesFolder &&
+      folderId.toString() === allNotesFolder._id.toString()
+    ) {
+      return res
+        .status(400)
+        .json({ message: "شما نمی توانید فولدر پیش فرض را حذف کنید." });
+    }
+
+    const deletedFolder = await Folder.findByIdAndDelete(folderId);
 
     if (!deletedFolder) {
       return res.status(404).json({ message: "فولدر پیدا نشد" });
@@ -59,7 +81,9 @@ const deleteFolder = async (req, res) => {
 
     res.json({ message: "فولدر با موفقیت حذف شد." });
   } catch (error) {
-    res.status(500).json(`خطایی به وجود آمده است: ${error}`);
+    res
+      .status(500)
+      .json({ message: `خطایی به وجود آمده است: ${error.message}` });
   }
 };
 

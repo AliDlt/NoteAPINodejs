@@ -1,5 +1,21 @@
 const Todo = require("../models/ToDo");
 
+// Get todo by ID
+const getTodoById = async (req, res) => {
+  const todoId = req.params.id;
+
+  try {
+    const todo = await Todo.findById(todoId);
+
+    if (!todo) {
+      return res.status(404).json({ message: "تودو پیدا نشد" });
+    }
+    res.status(200).json(todo);
+  } catch (error) {
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+  }
+};
+
 // Get all todos
 const getAllTodos = async (req, res) => {
   try {
@@ -11,7 +27,7 @@ const getAllTodos = async (req, res) => {
       res.json("هیچ تودویی وجود ندارد.");
     }
   } catch (error) {
-    res.json(`خطایی به وجود آمده است : ${error}`);
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }
 };
 
@@ -23,7 +39,7 @@ const createTodo = async (req, res) => {
     await todo.save();
     res.json("تودو با موفقیت افزوده شد.");
   } catch (error) {
-    res.json(`خطایی به وجود آمده است : ${error}`);
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }
 };
 
@@ -64,4 +80,10 @@ const deleteTodo = async (req, res) => {
   }
 };
 
-module.exports = { getAllTodos, createTodo, updateTodo, deleteTodo };
+module.exports = {
+  getAllTodos,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  getTodoById,
+};

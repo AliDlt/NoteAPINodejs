@@ -1,4 +1,18 @@
 const mongoose = require("mongoose");
+const Folder = require("../models/Folder");
+
+async function initializeDatabase() {
+  try {
+    const existingFolder = await Folder.findOne({ name: "All Notes" });
+
+    if (!existingFolder) {
+      const newFolder = new Folder({ name: "All Notes" });
+      await newFolder.save();
+    }
+  } catch (error) {
+    console.error(`Database initialization error: ${error.message}`);
+  }
+}
 
 const connectDB = async () => {
   try {
@@ -11,4 +25,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB, initializeDatabase };
