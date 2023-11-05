@@ -1,5 +1,21 @@
 const Folder = require("../models/Folder");
 
+// Get folder by ID
+const getFolderById = async (req, res) => {
+  const folderId = req.params.id;
+
+  try {
+    const folder = await Folder.findById(folderId);
+
+    if (!folder) {
+      return res.status(404).json({ message: "فولدر پیدا نشد" });
+    }
+    res.status(200).json(folder);
+  } catch (error) {
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+  }
+};
+
 // Get all folders
 const getAllFolders = async (req, res) => {
   try {
@@ -87,4 +103,10 @@ const deleteFolder = async (req, res) => {
   }
 };
 
-module.exports = { getAllFolders, deleteFolder, updateFolder, createFolder };
+module.exports = {
+  getAllFolders,
+  deleteFolder,
+  updateFolder,
+  createFolder,
+  getFolderById,
+};
