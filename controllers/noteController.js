@@ -56,17 +56,22 @@ const getAllNotes = async (req, res) => {
 // Create a new note
 const createNote = async (req, res) => {
   try {
-    const { title, content, todos, folderId, tags } = req.body;
+    var { title, content, todos, folderId, tags } = req.body;
 
     // Check if the specified folder exists
     const folderExists = await Folder.exists({ _id: folderId });
 
     if (!folderExists) {
-      return res.status(400).json({ message: "فولدر مورد نظر وجود ندارد." });
+      folderId = await Folder.findOne({ name: "All Notes" }).id;
     }
 
     const note = new Note({ title, content, todos, folderId, tags });
     await note.save();
+
+    await Folder.findByIdAndUpdate(folderId, {
+      $push: { Notes: note.id },
+    });
+
     res.json("نوت با موفقیت افزوده شد.");
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
@@ -76,14 +81,14 @@ const createNote = async (req, res) => {
 // Update an existing note by ID
 const updateNote = async (req, res) => {
   try {
-    const { title, content, todos, folderId, tags } = req.body;
+    var { title, content, todos, folderId, tags } = req.body;
     const noteId = req.body.id;
 
     // Check if the specified folder exists
     const folderExists = await Folder.exists({ _id: folderId });
 
     if (!folderExists) {
-      return res.status(400).json({ message: "فولدر مورد نظر وجود ندارد." });
+      folderId = await Folder.findOne({ name: "All Notes" }).id;
     }
     const updatedNote = await Note.findByIdAndUpdate(
       noteId,
@@ -93,6 +98,13 @@ const updateNote = async (req, res) => {
 
     if (!updatedNote) {
       return res.status(404).json({ message: "نوت پیدا نشد" });
+    }
+
+    if (folderId !== updatedNote.folder) {
+      await Folder.findByIdAndUpdate(updatedNote.folder, {
+        $pull: { Notes: noteId },
+      });
+      await Folder.findByIdAndUpdate(folderId, { $push: { Notes: noteId } });
     }
     res.json("نوت با موفقیت آپدیت شد.");
   } catch (error) {
