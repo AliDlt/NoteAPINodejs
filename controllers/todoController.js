@@ -1,4 +1,5 @@
 const Todo = require("../models/ToDo");
+const Note = require("../models/Note");
 
 // Get todo by ID
 const getTodoById = async (req, res) => {
@@ -47,7 +48,7 @@ const createTodo = async (req, res) => {
 const updateTodo = async (req, res) => {
   try {
     const { title, notes } = req.body;
-    const todoId = req.body.id;
+    const todoId = req.params.id;
     const updatedTodo = await Todo.findByIdAndUpdate(
       todoId,
       { title, notes },
@@ -66,12 +67,22 @@ const updateTodo = async (req, res) => {
 // Delete a todo by ID
 const deleteTodo = async (req, res) => {
   try {
-    const todoId = req.body.id;
+    const todoId = req.params.id;
 
-    const deletedTodo = await Note.findByIdAndDelete(todoId);
+    const deletedTodo = await Todo.findByIdAndDelete(todoId);
 
     if (!deletedTodo) {
       return res.status(404).json({ message: "تودو پیدا نشد" });
+    }
+
+    // Get all notes that contain this tag
+    const notesWithTodo = await Note.find({ todos: todoId });
+
+    // Remove the todo ID from the todos array in each note
+    for (let note of notesWithTodo) {
+      await Note.findByIdAndUpdate(note._id, {
+        $pull: { todos: todoId },
+      });
     }
 
     res.json({ message: "تودو با موفقیت حذف شد." });

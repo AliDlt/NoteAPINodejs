@@ -1,4 +1,5 @@
 const Tag = require("../models/Tag");
+const Note = require("../models/Note");
 
 // Get tag by ID
 const getTagById = async (req, res) => {
@@ -51,7 +52,7 @@ const createTag = async (req, res) => {
 const updateTag = async (req, res) => {
   try {
     const { title } = req.body;
-    const tagId = req.body.id;
+    const tagId = req.params.id;
     const updatedTag = await Tag.findByIdAndUpdate(
       tagId,
       { title },
@@ -74,12 +75,22 @@ const updateTag = async (req, res) => {
 // Delete a tag by ID
 const deleteTag = async (req, res) => {
   try {
-    const tagId = req.body.id;
+    const tagId = req.params.id;
 
     const deletedTag = await Tag.findByIdAndDelete(tagId);
 
     if (!deletedTag) {
       return res.status(404).json({ message: "تگ پیدا نشد" });
+    }
+
+    // Get all notes that contain this tag
+    const notesWithTag = await Note.find({ tags: tagId });
+
+    // Remove the tag ID from the tags array in each note
+    for (let note of notesWithTag) {
+      await Note.findByIdAndUpdate(note._id, {
+        $pull: { tags: tagId },
+      });
     }
 
     res.json({ message: "تگ با موفقیت حذف شد." });

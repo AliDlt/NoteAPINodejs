@@ -53,7 +53,7 @@ const createFolder = async (req, res) => {
 const updateFolder = async (req, res) => {
   try {
     const name = req.body;
-    const folderId = req.body.id;
+    const folderId = req.params.id;
 
     const updatedFolder = await Folder.findByIdAndUpdate(folderId, name, {
       new: true,
@@ -77,7 +77,7 @@ const updateFolder = async (req, res) => {
 // Delete a folder by ID
 const deleteFolder = async (req, res) => {
   try {
-    const folderId = req.body.id;
+    const folderId = req.params.id;
     const allNotesFolder = await Folder.findOne({ name: "All Notes" });
 
     if (

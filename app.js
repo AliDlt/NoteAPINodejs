@@ -7,6 +7,7 @@ const db = require("./configs/db");
 const noteRoute = require("./routes/noteRoute");
 const folderRoute = require("./routes/folderRoute");
 const todoRoute = require("./routes/todoRoutes");
+const tagRoute = require("./routes/tagRoute");
 
 require("dotenv").config();
 
@@ -26,6 +27,7 @@ app.use(bodyParser.json());
 app.use(noteRoute);
 app.use(folderRoute);
 app.use(todoRoute);
+app.use(tagRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

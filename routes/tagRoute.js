@@ -4,10 +4,10 @@ const tagController = require("../controllers/tagController");
 
 const router = new Router();
 
-router.get("/api/getTag/:id", tagController.getNoteById);
-router.get("/api/getallTags", tagController.getAllNotes);
-router.post("/api/addTag", tagController.createNote);
-router.put("/api/updateTag", tagController.updateNote);
-router.delete("/api/deleteTag", tagController.deleteNote);
+router.get("/api/getTag/:id", tagController.getTagById);
+router.get("/api/getallTags", tagController.getAllTags);
+router.post("/api/addTag", tagController.createTag);
+router.put("/api/updateTag/:id", tagController.updateTag);
+router.delete("/api/deleteTag/:id", tagController.deleteTag);
 
 module.exports = router;
