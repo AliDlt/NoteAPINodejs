@@ -1,4 +1,5 @@
 const Folder = require("../models/Folder");
+const Note = require("../models/Note");
 
 // Get folder by ID
 const getFolderById = async (req, res) => {
@@ -10,7 +11,17 @@ const getFolderById = async (req, res) => {
     if (!folder) {
       return res.status(404).json({ message: "فولدر پیدا نشد" });
     }
-    res.status(200).json(folder);
+
+    // Get detailed notes for the folder
+    const notes = await Note.find({
+      _id: { $in: folder.notes },
+    }).populate("todos tags");
+
+    res.status(200).json({
+      _id: folder._id,
+      name: folder.name,
+      notes: notes,
+    });
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }

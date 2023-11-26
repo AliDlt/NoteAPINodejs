@@ -6,12 +6,14 @@ const todoSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  notes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Note",
-    },
-  ],
+  note: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Note",
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("Todo", todoSchema);

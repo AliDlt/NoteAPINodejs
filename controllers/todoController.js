@@ -35,8 +35,8 @@ const getAllTodos = async (req, res) => {
 // Create a new todo
 const createTodo = async (req, res) => {
   try {
-    const { title, notes } = req.body;
-    const todo = new Todo({ title, notes });
+    const { title, note, isCompleted } = req.body;
+    const todo = new Todo({ title, note, isCompleted });
     await todo.save();
     res.json("تودو با موفقیت افزوده شد.");
   } catch (error) {
@@ -47,11 +47,11 @@ const createTodo = async (req, res) => {
 // Update an existing todo by ID
 const updateTodo = async (req, res) => {
   try {
-    const { title, notes } = req.body;
+    const { title, note, isCompleted } = req.body;
     const todoId = req.params.id;
     const updatedTodo = await Todo.findByIdAndUpdate(
       todoId,
-      { title, notes },
+      { title, note, isCompleted },
       { new: true }
     );
 

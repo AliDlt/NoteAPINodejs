@@ -2,8 +2,28 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: String,
-  password: String,
+  fullname: {
+    type: String,
+    require: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    require: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    require: true,
+    trim: true,
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false,
+  },
+  profile: {
+    type: String,
+  },
   folders: [
     {
       type: mongoose.Schema.Types.ObjectId,
