@@ -9,7 +9,7 @@ const getTodoById = async (req, res) => {
     const todo = await Todo.findById(todoId);
 
     if (!todo) {
-      return res.status(404).json({ message: "تودو پیدا نشد" });
+      return res.status(404).json([]);
     }
     res.status(200).json(todo);
   } catch (error) {
@@ -25,7 +25,7 @@ const getAllTodos = async (req, res) => {
     if (todos != null && todos.length > 0) {
       res.json(todos);
     } else {
-      res.json("هیچ تودویی وجود ندارد.");
+      return res.status(404).json([]);
     }
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
@@ -56,7 +56,7 @@ const updateTodo = async (req, res) => {
     );
 
     if (!updatedTodo) {
-      return res.status(404).json({ message: "تودو پیدا نشد" });
+      return res.status(404).json([]);
     }
     res.json("تودو با موفقیت آپدیت شد.");
   } catch (error) {
@@ -72,7 +72,7 @@ const deleteTodo = async (req, res) => {
     const deletedTodo = await Todo.findByIdAndDelete(todoId);
 
     if (!deletedTodo) {
-      return res.status(404).json({ message: "تودو پیدا نشد" });
+      return res.status(404).json([]);
     }
 
     // Get all notes that contain this tag

@@ -9,7 +9,7 @@ const getTagById = async (req, res) => {
     const tag = await Tag.findById(tagId);
 
     if (!tag) {
-      return res.status(404).json({ message: "تگ پیدا نشد" });
+      return res.status(404).json([]);
     }
     res.status(200).json(tag);
   } catch (error) {
@@ -25,7 +25,7 @@ const getAllTags = async (req, res) => {
     if (tags != null && tags.length > 0) {
       res.json(tags);
     } else {
-      res.json("هیچ تگی وجود ندارد.");
+      return res.status(404).json([]);
     }
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
@@ -60,7 +60,7 @@ const updateTag = async (req, res) => {
     );
 
     if (!updatedTag) {
-      return res.status(404).json({ message: "تگ پیدا نشد" });
+      return res.status(404).json([]);
     }
     res.json("تگ با موفقیت آپدیت شد.");
   } catch (error) {
@@ -80,7 +80,7 @@ const deleteTag = async (req, res) => {
     const deletedTag = await Tag.findByIdAndDelete(tagId);
 
     if (!deletedTag) {
-      return res.status(404).json({ message: "تگ پیدا نشد" });
+      return res.status(404).json([]);
     }
 
     // Get all notes that contain this tag

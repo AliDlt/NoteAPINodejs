@@ -11,7 +11,7 @@ const getNoteById = async (req, res) => {
     const note = await Note.findById(noteId);
 
     if (!note) {
-      return res.status(404).json({ message: "نوت پیدا نشد" });
+      return res.status(404).json([]);
     }
     res.status(200).json(note);
   } catch (error) {
@@ -32,7 +32,7 @@ const searchNote = async (req, res) => {
     }).select("id title content");
 
     if (!notes || notes.length === 0) {
-      return res.status(404).json({ message: "نوتی پیدا نشد" });
+      return res.status(404).json([]);
     }
 
     res.status(200).json(notes);
@@ -49,7 +49,7 @@ const getAllNotes = async (req, res) => {
     if (notes != null && notes.length > 0) {
       res.json(notes);
     } else {
-      res.json("هیچ نوتی وجود ندارد.");
+      res.status(404).json([]);
     }
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
@@ -67,9 +67,7 @@ const createNote = async (req, res) => {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res
-            .status(400)
-            .json({ message: `تگ آیدی ${tagId} وجود ندارد.` });
+          return res.status(404).json([]);
         }
         validTags.push(tagId);
       }
@@ -81,9 +79,7 @@ const createNote = async (req, res) => {
       for (let todoId of todos) {
         const todoExists = await Todo.exists({ _id: todoId });
         if (!todoExists) {
-          return res
-            .status(400)
-            .json({ message: `آیدی تودو ${todoId} وجود ندارد.` });
+          return res.status(404).json([]);
         }
         validTodos.push(todoId);
       }
@@ -97,7 +93,7 @@ const createNote = async (req, res) => {
       const defaultFolder = await Folder.findOne({ name: "All Notes" });
 
       if (!defaultFolder) {
-        return res.status(404).json({ message: "هیچ فولدری یافت نشد." });
+        return res.status(404).json([]);
       }
 
       folderId = defaultFolder._id;
@@ -136,9 +132,7 @@ const updateNote = async (req, res) => {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res
-            .status(400)
-            .json({ message: `تگ آیدی ${tagId} وجود ندارد.` });
+          return res.status(404).json([]);
         }
         validTags.push(tagId);
       }
@@ -150,9 +144,7 @@ const updateNote = async (req, res) => {
       for (let todoId of todos) {
         const todoExists = await Todo.exists({ _id: todoId });
         if (!todoExists) {
-          return res
-            .status(400)
-            .json({ message: `آیدی تودو ${todoId} وجود ندارد.` });
+          return res.status(404).json([]);
         }
         validTodos.push(todoId);
       }
@@ -166,7 +158,7 @@ const updateNote = async (req, res) => {
       const defaultFolder = await Folder.findOne({ name: "All Notes" });
 
       if (!defaultFolder) {
-        return res.status(404).json({ message: "هیچ فولدری یافت نشد." });
+        return res.status(404).json([]);
       }
 
       folderId = defaultFolder._id;
@@ -179,7 +171,7 @@ const updateNote = async (req, res) => {
     );
 
     if (!updatedNote) {
-      return res.status(404).json({ message: "نوت پیدا نشد" });
+      return res.status(404).json([]);
     }
 
     await Folder.findByIdAndUpdate(folderId, { $push: { notes: noteId } });
@@ -198,7 +190,7 @@ const deleteNote = async (req, res) => {
     const deletedNote = await Note.findByIdAndDelete(noteId);
 
     if (!deletedNote) {
-      return res.status(404).json({ message: "نوت پیدا نشد" });
+      return res.status(404).json([]);
     }
 
     // Get the ID of the folder this note belonged to
