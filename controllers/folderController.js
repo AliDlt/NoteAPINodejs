@@ -9,7 +9,7 @@ const getFolderById = async (req, res) => {
     const folder = await Folder.findById(folderId);
 
     if (!folder) {
-      return res.status(404).json([]);
+      return res.json([]);
     }
 
     // Get detailed notes for the folder
@@ -35,7 +35,7 @@ const getAllFolders = async (req, res) => {
     if (folders != null && folders.length > 0) {
       res.json(folders);
     } else {
-      res.status(404).json([]);
+      res.json([]);
     }
   } catch (error) {
     res.json(`خطایی به وجود آمده است : ${error}`);
@@ -71,7 +71,7 @@ const updateFolder = async (req, res) => {
     });
 
     if (!updatedFolder) {
-      return res.status(404).json([]);
+      return res.json([]);
     }
     res.json("فولدر با موفقیت آپدیت شد.");
   } catch (error) {
@@ -103,7 +103,7 @@ const deleteFolder = async (req, res) => {
     const deletedFolder = await Folder.findByIdAndDelete(folderId);
 
     if (!deletedFolder) {
-      return res.status(404).json([]);
+      return res.json([]);
     }
 
     res.json({ message: "فولدر با موفقیت حذف شد." });
