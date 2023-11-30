@@ -47,7 +47,7 @@ const getAllNotes = async (req, res) => {
     const notes = await Note.find();
 
     if (notes != null && notes.length > 0) {
-      res.json(notes);
+      res.status(200).json(notes);
     } else {
       res.json([]);
     }
@@ -114,7 +114,7 @@ const createNote = async (req, res) => {
     // Update the notes property of the associated folder
     await Folder.findByIdAndUpdate(folderToUse, { $push: { notes: note._id } });
 
-    res.json("نوت با موفقیت افزوده شد.");
+    res.status(200).json(note);
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }
@@ -176,7 +176,7 @@ const updateNote = async (req, res) => {
 
     await Folder.findByIdAndUpdate(folderId, { $push: { notes: noteId } });
 
-    res.json("نوت با موفقیت آپدیت شد.");
+    res.status(200).json(updatedNote);
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }
@@ -211,7 +211,7 @@ const deleteNote = async (req, res) => {
       });
     }
 
-    res.json({ message: "نوت با موفقیت حذف شد." });
+    res.status(200).json(deletedNote);
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }

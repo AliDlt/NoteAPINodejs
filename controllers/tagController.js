@@ -23,7 +23,7 @@ const getAllTags = async (req, res) => {
     const tags = await Tag.find();
 
     if (tags != null && tags.length > 0) {
-      res.json(tags);
+      res.status(200).json(tags);
     } else {
       return res.json([]);
     }
@@ -38,7 +38,7 @@ const createTag = async (req, res) => {
     const { title } = req.body;
     const tag = new Tag({ title });
     await tag.save();
-    res.json("تگ با موفقیت افزوده شد.");
+    res.status(200).json(tag);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
       res.status(400).json({ message: "تگ با این عنوان قبلاً ایجاد شده است." });
@@ -62,7 +62,7 @@ const updateTag = async (req, res) => {
     if (!updatedTag) {
       return res.json([]);
     }
-    res.json("تگ با موفقیت آپدیت شد.");
+    res.status(200).json(updatedTag);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
       res.status(400).json({ message: "تگ با این عنوان قبلاً ایجاد شده است." });
@@ -93,7 +93,7 @@ const deleteTag = async (req, res) => {
       });
     }
 
-    res.json({ message: "تگ با موفقیت حذف شد." });
+    res.status(200).json(deletedTag);
   } catch (error) {
     res.status(500).json(`خطایی به وجود آمده است: ${error}`);
   }

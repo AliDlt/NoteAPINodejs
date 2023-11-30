@@ -33,7 +33,7 @@ const getAllFolders = async (req, res) => {
     const folders = await Folder.find();
 
     if (folders != null && folders.length > 0) {
-      res.json(folders);
+      res.status(200).json(folders);
     } else {
       res.json([]);
     }
@@ -48,7 +48,7 @@ const createFolder = async (req, res) => {
     const name = req.body;
     const folder = new Folder(name);
     await folder.save();
-    res.json("فولدر با موفقیت افزوده شد.");
+    res.status(200).json(folder);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
       res
@@ -73,7 +73,7 @@ const updateFolder = async (req, res) => {
     if (!updatedFolder) {
       return res.json([]);
     }
-    res.json("فولدر با موفقیت آپدیت شد.");
+    res.status(200).json(updatedFolder);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
       res
@@ -106,7 +106,7 @@ const deleteFolder = async (req, res) => {
       return res.json([]);
     }
 
-    res.json({ message: "فولدر با موفقیت حذف شد." });
+    res.status(200).json(deletedFolder);
   } catch (error) {
     res
       .status(500)

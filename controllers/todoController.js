@@ -23,7 +23,7 @@ const getAllTodos = async (req, res) => {
     const todos = await Todo.find();
 
     if (todos != null && todos.length > 0) {
-      res.json(todos);
+      res.status(200).json(todos);
     } else {
       return res.json([]);
     }
@@ -38,7 +38,7 @@ const createTodo = async (req, res) => {
     const { title, note, isCompleted } = req.body;
     const todo = new Todo({ title, note, isCompleted });
     await todo.save();
-    res.json("تودو با موفقیت افزوده شد.");
+    res.status(200).json(todo);
   } catch (error) {
     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
   }
@@ -58,7 +58,7 @@ const updateTodo = async (req, res) => {
     if (!updatedTodo) {
       return res.json([]);
     }
-    res.json("تودو با موفقیت آپدیت شد.");
+    res.status(200).json(updateTodo);
   } catch (error) {
     res.status(500).json(`خطایی به وجود آمده است: ${error}`);
   }
@@ -85,7 +85,7 @@ const deleteTodo = async (req, res) => {
       });
     }
 
-    res.json({ message: "تودو با موفقیت حذف شد." });
+    res.status(200).json(deletedTodo);
   } catch (error) {
     res.status(500).json(`خطایی به وجود آمده است: ${error}`);
   }
