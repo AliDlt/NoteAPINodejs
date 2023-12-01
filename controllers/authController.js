@@ -9,7 +9,7 @@ const registerUser = async (req, res) => {
     const { fullname, email, password } = req.body;
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(404).json("کاربری با این ایمیل از قبل وجود دارد.");
+      return res.status(400).json("کاربری با این ایمیل از قبل وجود دارد.");
     }
     const confirmationToken = generateToken({ email });
     await User.create({ fullname, email, password });

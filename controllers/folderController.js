@@ -19,7 +19,7 @@ const getFolderById = async (req, res) => {
 
     res.status(200).json({
       _id: folder._id,
-      name: folder.name,
+      title: folder.title,
       notes: notes,
     });
   } catch (error) {
@@ -45,8 +45,8 @@ const getAllFolders = async (req, res) => {
 // Create a new folder
 const createFolder = async (req, res) => {
   try {
-    const name = req.body;
-    const folder = new Folder(name);
+    const title = req.body;
+    const folder = new Folder(title);
     await folder.save();
     res.status(200).json(folder);
   } catch (error) {
@@ -63,10 +63,10 @@ const createFolder = async (req, res) => {
 // Update an existing folder by ID
 const updateFolder = async (req, res) => {
   try {
-    const name = req.body;
+    const title = req.body;
     const folderId = req.params.id;
 
-    const updatedFolder = await Folder.findByIdAndUpdate(folderId, name, {
+    const updatedFolder = await Folder.findByIdAndUpdate(folderId, title, {
       new: true,
     });
 
@@ -89,7 +89,7 @@ const updateFolder = async (req, res) => {
 const deleteFolder = async (req, res) => {
   try {
     const folderId = req.params.id;
-    const allNotesFolder = await Folder.findOne({ name: "All Notes" });
+    const allNotesFolder = await Folder.findOne({ title: "All Notes" });
 
     if (
       allNotesFolder &&
