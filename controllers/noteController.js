@@ -42,19 +42,19 @@ const searchNote = async (req, res) => {
 };
 
 // Get all notes
-const getAllNotes = async (req, res) => {
-  try {
-    const notes = await Note.find();
+// const getAllNotes = async (req, res) => {
+//   try {
+//     const notes = await Note.find();
 
-    if (notes != null && notes.length > 0) {
-      res.status(200).json(notes);
-    } else {
-      res.json([]);
-    }
-  } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
-  }
-};
+//     if (notes != null && notes.length > 0) {
+//       res.status(200).json(notes);
+//     } else {
+//       res.json([]);
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+//   }
+// };
 
 // Create a new note
 const createNote = async (req, res) => {
@@ -218,7 +218,7 @@ const deleteNote = async (req, res) => {
 };
 
 module.exports = {
-  getAllNotes,
+  // getAllNotes,
   createNote,
   updateNote,
   deleteNote,
