@@ -10,6 +10,7 @@ router.post("/api/login", authController.loginUser);
 router.post("/api/reset-password", authController.resetPassword);
 router.post("/api/confirm-email", authController.confirmEmail);
 router.post("/api/change-user", authController.changeUser);
+
 // router.post(
 //   "/api/uploadProfile/:id",
 //   upload.uploadConfig,

@@ -42,19 +42,19 @@ const searchNote = async (req, res) => {
 };
 
 // Get all notes
-// const getAllNotes = async (req, res) => {
-//   try {
-//     const notes = await Note.find();
+const getAllNotes = async (req, res) => {
+  try {
+    const notes = await Note.find();
 
-//     if (notes != null && notes.length > 0) {
-//       res.status(200).json(notes);
-//     } else {
-//       res.json([]);
-//     }
-//   } catch (error) {
-//     res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
-//   }
-// };
+    if (notes != null && notes.length > 0) {
+      res.status(200).json(notes);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+  }
+};
 
 // Create a new note
 const createNote = async (req, res) => {
@@ -67,7 +67,7 @@ const createNote = async (req, res) => {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res.json([]);
+          return res.status(404).json([]);
         }
         validTags.push(tagId);
       }
@@ -79,7 +79,7 @@ const createNote = async (req, res) => {
       for (let todoId of todos) {
         const todoExists = await Todo.exists({ _id: todoId });
         if (!todoExists) {
-          return res.json([]);
+          return res.status(404).json([]);
         }
         validTodos.push(todoId);
       }
@@ -93,7 +93,7 @@ const createNote = async (req, res) => {
       const defaultFolder = await Folder.findOne({ name: "All Notes" });
 
       if (!defaultFolder) {
-        return res.json([]);
+        return res.status(404).json([]);
       }
 
       folderId = defaultFolder._id;
@@ -218,7 +218,7 @@ const deleteNote = async (req, res) => {
 };
 
 module.exports = {
-  // getAllNotes,
+  getAllNotes,
   createNote,
   updateNote,
   deleteNote,

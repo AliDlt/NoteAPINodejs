@@ -3,10 +3,10 @@ const Folder = require("../models/Folder");
 
 async function initializeDatabase() {
   try {
-    const existingFolder = await Folder.findOne({ name: "All Notes" });
+    const existingFolder = await Folder.findOne({ title: "All Notes" });
 
     if (!existingFolder) {
-      const newFolder = new Folder({ name: "All Notes" });
+      const newFolder = new Folder({ title: "All Notes" });
       await newFolder.save();
     }
   } catch (error) {
