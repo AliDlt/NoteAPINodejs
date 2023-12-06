@@ -27,6 +27,32 @@ const getFolderById = async (req, res) => {
   }
 };
 
+// Get Detail Folder
+const getDetailFolder = async (req, res) => {
+  const folderId = req.params.id;
+
+  try {
+    const folder = await Folder.findById(folderId);
+
+    if (!folder) {
+      return res.json([]);
+    }
+
+    // Get detailed notes for the folder
+    const notes = await Note.find({
+      _id: { $in: folder.notes },
+    }).populate("todos tags");
+
+    res.status(200).json({
+      _id: folder._id,
+      title: folder.title,
+      notes: notes,
+    });
+  } catch (error) {
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+  }
+};
+
 // Get all folders
 const getAllFolders = async (req, res) => {
   try {
@@ -120,4 +146,5 @@ module.exports = {
   updateFolder,
   createFolder,
   getFolderById,
+  getDetailFolder,
 };
