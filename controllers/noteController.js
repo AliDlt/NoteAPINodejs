@@ -56,6 +56,23 @@ const getAllNotes = async (req, res) => {
   }
 };
 
+//Get all notes by folder
+const getNotesByFolderId = async (req, res) => {
+  try {
+    const folderId = req.params.id;
+
+    const notes = await Note.find({ folder: folderId });
+
+    if (notes != null && notes.length > 0) {
+      res.status(200).json(notes);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+  }
+};
+
 // Create a new note
 const createNote = async (req, res) => {
   try {
@@ -219,6 +236,7 @@ const deleteNote = async (req, res) => {
 
 module.exports = {
   getAllNotes,
+  getNotesByFolderId,
   createNote,
   updateNote,
   deleteNote,
