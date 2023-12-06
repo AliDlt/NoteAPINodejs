@@ -60,7 +60,6 @@ const getAllNotes = async (req, res) => {
 const getNotesByFolderId = async (req, res) => {
   try {
     const folderId = req.params.id;
-
     const notes = await Note.find({ folder: folderId });
 
     if (notes != null && notes.length > 0) {
@@ -107,7 +106,7 @@ const createNote = async (req, res) => {
 
     if (!folderExists) {
       // Check if the default folder ("All Notes") exists
-      const defaultFolder = await Folder.findOne({ name: "All Notes" });
+      const defaultFolder = await Folder.findOne({ title: "All Notes" });
 
       if (!defaultFolder) {
         return res.status(404).json([]);
@@ -172,7 +171,7 @@ const updateNote = async (req, res) => {
 
     if (!folderExists) {
       // Check if the default folder ("All Notes") exists
-      const defaultFolder = await Folder.findOne({ name: "All Notes" });
+      const defaultFolder = await Folder.findOne({ title: "All Notes" });
 
       if (!defaultFolder) {
         return res.json([]);
