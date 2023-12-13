@@ -11,11 +11,15 @@ const getNoteById = async (req, res) => {
     const note = await Note.findById(noteId);
 
     if (!note) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the note wasn't found", data: [] });
     }
-    res.status(200).json(note);
+    res.status(200).json({ message: "successful", data: [] });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -32,12 +36,14 @@ const searchNote = async (req, res) => {
     }).select("id title content");
 
     if (!notes || notes.length === 0) {
-      return res.json([]);
+      return res.status(404).json({ message: "there is no note", data: [] });
     }
 
-    res.status(200).json(notes);
+    res.status(200).json({ message: "successful", data: notes });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -47,12 +53,14 @@ const getAllNotes = async (req, res) => {
     const notes = await Note.find();
 
     if (notes != null && notes.length > 0) {
-      res.status(200).json(notes);
+      res.status(200).json({ message: "successful", data: notes });
     } else {
-      res.json([]);
+      res.status(404).json({ message: "there is no note", data: [] });
     }
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -63,12 +71,14 @@ const getNotesByFolderId = async (req, res) => {
     const notes = await Note.find({ folder: folderId });
 
     if (notes != null && notes.length > 0) {
-      res.status(200).json(notes);
+      res.status(200).json({ message: "successful", data: notes });
     } else {
-      res.json([]);
+      res.status(404).json({ message: "there is no note", data: [] });
     }
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -83,7 +93,7 @@ const createNote = async (req, res) => {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res.status(404).json([]);
+          return res.status(404).json({ message: "there is no tag", data: [] });
         }
         validTags.push(tagId);
       }
@@ -95,7 +105,9 @@ const createNote = async (req, res) => {
       for (let todoId of todos) {
         const todoExists = await Todo.exists({ _id: todoId });
         if (!todoExists) {
-          return res.status(404).json([]);
+          return res
+            .status(404)
+            .json({ message: "there is no todo", data: [] });
         }
         validTodos.push(todoId);
       }
@@ -109,7 +121,10 @@ const createNote = async (req, res) => {
       const defaultFolder = await Folder.findOne({ title: "All Notes" });
 
       if (!defaultFolder) {
-        return res.status(404).json([]);
+        return res.status(404).json({
+          message: "there is no default folder",
+          data: [],
+        });
       }
 
       folderId = defaultFolder._id;
@@ -130,9 +145,11 @@ const createNote = async (req, res) => {
     // Update the notes property of the associated folder
     await Folder.findByIdAndUpdate(folderToUse, { $push: { notes: note._id } });
 
-    res.status(200).json(note);
+    res.status(200).json({ message: "successful", data: note });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -148,7 +165,7 @@ const updateNote = async (req, res) => {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res.json([]);
+          return res.status(404).json({ message: "there is no tag", data: [] });
         }
         validTags.push(tagId);
       }
@@ -160,7 +177,9 @@ const updateNote = async (req, res) => {
       for (let todoId of todos) {
         const todoExists = await Todo.exists({ _id: todoId });
         if (!todoExists) {
-          return res.json([]);
+          return res
+            .status(404)
+            .json({ message: "there is no todo", data: [] });
         }
         validTodos.push(todoId);
       }
@@ -174,7 +193,10 @@ const updateNote = async (req, res) => {
       const defaultFolder = await Folder.findOne({ title: "All Notes" });
 
       if (!defaultFolder) {
-        return res.json([]);
+        return res.status(404).json({
+          message: "there is no default folder",
+          data: [],
+        });
       }
 
       folderId = defaultFolder._id;
@@ -187,14 +209,16 @@ const updateNote = async (req, res) => {
     );
 
     if (!updatedNote) {
-      return res.json([]);
+      return res.status(404).json({ message: "there is no note", data: [] });
     }
 
     await Folder.findByIdAndUpdate(folderId, { $push: { notes: noteId } });
 
-    res.status(200).json(updatedNote);
+    res.status(200).json({ message: "successful", data: updatedNote });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -206,7 +230,7 @@ const deleteNote = async (req, res) => {
     const deletedNote = await Note.findByIdAndDelete(noteId);
 
     if (!deletedNote) {
-      return res.json([]);
+      return res.status(404).json({ message: "there is no note", data: [] });
     }
 
     // Get the ID of the folder this note belonged to
@@ -227,9 +251,11 @@ const deleteNote = async (req, res) => {
       });
     }
 
-    res.status(200).json(deletedNote);
+    res.status(200).json({ message: "successful", data: deletedNote });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 

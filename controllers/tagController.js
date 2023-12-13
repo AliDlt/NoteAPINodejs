@@ -9,11 +9,15 @@ const getTagById = async (req, res) => {
     const tag = await Tag.findById(tagId);
 
     if (!tag) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the tag wasn't found", data: [] });
     }
     res.status(200).json(tag);
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -25,25 +29,42 @@ const getAllTags = async (req, res) => {
     if (tags != null && tags.length > 0) {
       res.status(200).json(tags);
     } else {
-      return res.json([]);
+      return res.status(404).json({ message: "there is no tag", data: [] });
     }
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
 // Create a new tag
 const createTag = async (req, res) => {
   try {
-    const { title } = req.body;
-    const tag = new Tag({ title });
+    const { title, noteId } = req.body;
+
+    const note = await Note.findById(noteId);
+
+    if (!note) {
+      return res
+        .status(404)
+        .json({ message: "The note wasn't found", data: [] });
+    }
+
+    const tag = new Tag({ title, noteId });
     await tag.save();
-    res.status(200).json(tag);
+
+    // Update the Note with the new todoId
+    await Note.findByIdAndUpdate(noteId, { $push: { tags: tag._id } });
+
+    res.status(200).json({ message: "Successful", data: tag });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "تگ با این عنوان قبلاً ایجاد شده است." });
+      res.status(400).json({ message: "tag is already exist", data: [] });
     } else {
-      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+      res
+        .status(500)
+        .json({ message: `there is an error: ${error.message}`, data: [] });
     }
   }
 };
@@ -51,7 +72,16 @@ const createTag = async (req, res) => {
 // Update an existing tag by ID
 const updateTag = async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, noteId } = req.body;
+
+    const note = await Note.findById(noteId);
+
+    if (!note) {
+      return res
+        .status(404)
+        .json({ message: "The note wasn't found", data: [] });
+    }
+
     const tagId = req.params.id;
     const updatedTag = await Tag.findByIdAndUpdate(
       tagId,
@@ -60,14 +90,19 @@ const updateTag = async (req, res) => {
     );
 
     if (!updatedTag) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "The tag wasn't found", data: [] });
     }
-    res.status(200).json(updatedTag);
+
+    res.status(200).json({ message: "Successful", data: updatedTag });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "تگ با این عنوان قبلاً ایجاد شده است." });
+      res.status(400).json({ message: "tag is already exist", data: [] });
     } else {
-      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+      res
+        .status(500)
+        .json({ message: `there is an error: ${error.message}`, data: [] });
     }
   }
 };
@@ -80,7 +115,9 @@ const deleteTag = async (req, res) => {
     const deletedTag = await Tag.findByIdAndDelete(tagId);
 
     if (!deletedTag) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "The tag wasn't found", data: [] });
     }
 
     // Get all notes that contain this tag
@@ -93,9 +130,11 @@ const deleteTag = async (req, res) => {
       });
     }
 
-    res.status(200).json(deletedTag);
+    res.status(200).json({ message: "Successful", data: deletedTag });
   } catch (error) {
-    res.status(500).json(`خطایی به وجود آمده است: ${error}`);
+    res
+      .status(500)
+      .json({ message: `there is and error : ${error}`, data: [] });
   }
 };
 

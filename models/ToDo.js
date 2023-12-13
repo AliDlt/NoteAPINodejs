@@ -6,7 +6,7 @@ const todoSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  note: {
+  noteId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Note",
   },

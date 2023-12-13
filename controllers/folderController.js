@@ -9,7 +9,9 @@ const getFolderById = async (req, res) => {
     const folder = await Folder.findById(folderId);
 
     if (!folder) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the folder wasn't found", data: [] });
     }
 
     // Get detailed notes for the folder
@@ -18,12 +20,17 @@ const getFolderById = async (req, res) => {
     }).populate("todos tags");
 
     res.status(200).json({
-      _id: folder._id,
-      title: folder.title,
-      notes: notes,
+      message: "successful",
+      data: {
+        _id: folder._id,
+        title: folder.title,
+        notes: notes,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -35,7 +42,9 @@ const getDetailFolder = async (req, res) => {
     const folder = await Folder.findById(folderId);
 
     if (!folder) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the folder didn't found", data: [] });
     }
 
     // Get detailed notes for the folder
@@ -44,12 +53,17 @@ const getDetailFolder = async (req, res) => {
     }).populate("todos tags");
 
     res.status(200).json({
-      _id: folder._id,
-      title: folder.title,
-      notes: notes,
+      message: "successful",
+      data: {
+        _id: folder._id,
+        title: folder.title,
+        notes: notes,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -59,7 +73,9 @@ const getDefaultFolder = async (req, res) => {
     const folder = await Folder.findOne({ title: "All Notes" });
 
     if (!folder) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the folder didn't found", data: [] });
     }
 
     // Get detailed notes for the folder
@@ -68,12 +84,17 @@ const getDefaultFolder = async (req, res) => {
     }).populate("todos tags");
 
     res.status(200).json({
-      _id: folder._id,
-      title: folder.title,
-      notes: notes,
+      message: "successful",
+      data: {
+        _id: folder._id,
+        title: folder.title,
+        notes: notes,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: [] });
   }
 };
 
@@ -83,12 +104,12 @@ const getAllFolders = async (req, res) => {
     const folders = await Folder.find();
 
     if (folders != null && folders.length > 0) {
-      res.status(200).json(folders);
+      res.status(200).json({ message: "successful", data: folders });
     } else {
-      res.json([]);
+      res.status(404).json({ message: "the folder didn't found", data: [] });
     }
   } catch (error) {
-    res.json(`خطایی به وجود آمده است : ${error}`);
+    res.status(500).json({ message: `there is an error: ${error}`, data: [] });
   }
 };
 
@@ -98,14 +119,14 @@ const createFolder = async (req, res) => {
     const title = req.body;
     const folder = new Folder(title);
     await folder.save();
-    res.status(200).json(folder);
+    res.status(200).json({ message: "successful", data: folder });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res
-        .status(400)
-        .json({ message: "فولدر با این عنوان قبلاً ایجاد شده است." });
+      res.status(400).json({ message: "the folder already exist", data: [] });
     } else {
-      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+      res
+        .status(500)
+        .json({ message: `there is an error:${error.message}`, data: [] });
     }
   }
 };
@@ -121,16 +142,18 @@ const updateFolder = async (req, res) => {
     });
 
     if (!updatedFolder) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the folder didn't found", data: [] });
     }
-    res.status(200).json(updatedFolder);
+    res.status(200).json({ message: "successful", data: updatedFolder });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res
-        .status(400)
-        .json({ message: "فولدر با این عنوان قبلاً ایجاد شده است." });
+      res.status(400).json({ message: "the folder already exist", data: [] });
     } else {
-      res.status(500).json({ message: `خطایی به وجود آمد: ${error.message}` });
+      res
+        .status(500)
+        .json({ message: `there is an error :${error.message}`, data: [] });
     }
   }
 };
@@ -147,20 +170,22 @@ const deleteFolder = async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ message: "شما نمی توانید فولدر پیش فرض را حذف کنید." });
+        .json({ message: "you can not delete default folder", data: [] });
     }
 
     const deletedFolder = await Folder.findByIdAndDelete(folderId);
 
     if (!deletedFolder) {
-      return res.json([]);
+      return res
+        .status(404)
+        .json({ message: "the folder didn't found", data: [] });
     }
 
-    res.status(200).json(deletedFolder);
+    res.status(200).json({ message: "successful", data: [] });
   } catch (error) {
     res
       .status(500)
-      .json({ message: `خطایی به وجود آمده است: ${error.message}` });
+      .json({ message: `there is an error : ${error.message}`, data: [] });
   }
 };
 

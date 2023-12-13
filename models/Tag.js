@@ -7,7 +7,7 @@ const tagSchmea = new mongoose.Schema({
     trim: true,
     unique: true,
   },
-  note: [
+  noteId: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Note",
