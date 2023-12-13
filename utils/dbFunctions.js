@@ -6,10 +6,12 @@ async function initializeDefaultFolder(userId) {
     if (!existingFolder) {
       const newFolder = new Folder({ title: "Default Folder", userId });
       await newFolder.save();
-      return { message: "successful", data: true };
+      return { message: "successful", data: newFolder };
+    } else {
+      return { message: "successful", data: existingFolder };
     }
   } catch (error) {
-    return { message: error, data: false };
+    return { message: error, data: [] };
   }
 }
 

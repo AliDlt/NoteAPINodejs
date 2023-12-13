@@ -21,6 +21,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isChanged: {
+    type: Boolean,
+    default: false,
+  },
   profile: {
     type: String,
   },
