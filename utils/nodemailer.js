@@ -1,37 +1,44 @@
 const nodemailer = require("nodemailer");
 const smtpTransport = require("nodemailer-smtp-transport");
 
-const transporterDetails = smtpTransport({
-  host: "mail.alidlt.ir",
+const transporterDetails = {
+  host: "server01.clientspanel.com",
   port: 465,
   secure: true,
   auth: {
     user: "no-reply@alidlt.ir",
     pass: "X7SWoVI5Rs8-",
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+};
 
-function sendConfirmationEmail(userEmail, confirmationToken) {
-  const transporter = nodemailer.createTransport(transporterDetails);
-  transporter.sendMail({
-    from: "no-reply@alidlt.ir",
-    to: userEmail,
-    subject: "تائید حساب کاربری",
-    html: `<p>Click the following link to confirm your email: <a href="http://your-app.com/confirm/${confirmationToken}">Confirm Email</a></p>`,
-  });
+const transporter = nodemailer.createTransport(
+  smtpTransport(transporterDetails)
+);
+
+async function sendConfirmationEmail(fullname, userEmail, confirmationToken) {
+  try {
+    const info = await transporter.sendMail({
+      from: "no-reply@alidlt.ir",
+      to: userEmail,
+      subject: "User account verification",
+      text: `Click the following link to confirm your email: http://your-app.com/confirm/${confirmationToken}`,
+      html: `<p>Hi ${fullname},</p>
+         <p>Click the following link to confirm your email: <a href="http://your-app.com/confirm/${confirmationToken}">http://your-app.com/confirm/${confirmationToken}</a></p>
+         <p>If you didn't request this email, please ignore it.</p>
+         <p>Thanks,<br>Your App Team</p>`,
+    });
+    return {
+      status: true,
+      message: "Email sent successfully",
+      info: info,
+    };
+  } catch (error) {
+    throw {
+      status: false,
+      message: "Error sending email",
+      error: error,
+    };
+  }
 }
 
-function sendEmail(userEmail) {
-  const transporter = nodemailer.createTransport(transporterDetails);
-  transporter.sendMail({
-    from: "no-reply@alidlt.ir",
-    to: userEmail,
-    subject: "تائید حساب کاربری",
-    html: `<p>Click the following link to confirm your email: <a href="http://your-app.com/confirm/S">Confirm Email</a></p>`,
-  });
-}
-
-module.exports = { sendConfirmationEmail, sendEmail };
+module.exports = { sendConfirmationEmail };

@@ -20,7 +20,7 @@ app.use(cors());
 
 //* Database connection and Init
 db.connectDB();
-db.initializeDatabase();
+// db.initializeDatabase();
 
 app.use(express.json());
 

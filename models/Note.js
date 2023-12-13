@@ -14,7 +14,7 @@ const noteSchmea = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  folder: {
+  folderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Folder",
   },

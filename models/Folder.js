@@ -7,6 +7,10 @@ const folderSchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   notes: [
     {
       type: mongoose.Schema.Types.ObjectId,

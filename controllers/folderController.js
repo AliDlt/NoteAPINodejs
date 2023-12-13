@@ -70,7 +70,7 @@ const getDetailFolder = async (req, res) => {
 // Get Default Folder
 const getDefaultFolder = async (req, res) => {
   try {
-    const folder = await Folder.findOne({ title: "All Notes" });
+    const folder = await Folder.findOne({ title: "Default Folder" });
 
     if (!folder) {
       return res
@@ -162,7 +162,7 @@ const updateFolder = async (req, res) => {
 const deleteFolder = async (req, res) => {
   try {
     const folderId = req.params.id;
-    const allNotesFolder = await Folder.findOne({ title: "All Notes" });
+    const allNotesFolder = await Folder.findOne({ title: "Default Folder" });
 
     if (
       allNotesFolder &&

@@ -68,7 +68,7 @@ const getAllNotes = async (req, res) => {
 const getNotesByFolderId = async (req, res) => {
   try {
     const folderId = req.params.id;
-    const notes = await Note.find({ folder: folderId });
+    const notes = await Note.find({ folderId: folderId });
 
     if (notes != null && notes.length > 0) {
       res.status(200).json({ message: "successful", data: notes });
@@ -117,8 +117,8 @@ const createNote = async (req, res) => {
     const folderExists = await Folder.exists({ _id: folderId });
 
     if (!folderExists) {
-      // Check if the default folder ("All Notes") exists
-      const defaultFolder = await Folder.findOne({ title: "All Notes" });
+      // Check if the default folder ("Default Folder") exists
+      const defaultFolder = await Folder.findOne({ title: "Default Folder" });
 
       if (!defaultFolder) {
         return res.status(404).json({
@@ -130,14 +130,14 @@ const createNote = async (req, res) => {
       folderId = defaultFolder._id;
     }
 
-    // Use the specified folderId or find the default folder ("All Notes")
+    // Use the specified folderId or find the default folder ("Default Folder")
     const folderToUse = folderId || ReadableStreamDefaultController._id;
 
     const note = new Note({
       title,
       content,
       todos: validTodos,
-      folder: folderToUse,
+      folderId: folderToUse,
       tags: validTags,
     });
     await note.save();
@@ -189,8 +189,8 @@ const updateNote = async (req, res) => {
     const folderExists = await Folder.exists({ _id: folderId });
 
     if (!folderExists) {
-      // Check if the default folder ("All Notes") exists
-      const defaultFolder = await Folder.findOne({ title: "All Notes" });
+      // Check if the default folder ("Default Folder") exists
+      const defaultFolder = await Folder.findOne({ title: "Default Folder" });
 
       if (!defaultFolder) {
         return res.status(404).json({
@@ -204,7 +204,13 @@ const updateNote = async (req, res) => {
 
     const updatedNote = await Note.findByIdAndUpdate(
       noteId,
-      { title, content, todos: validTodos, tags: validTags, folder: folderId },
+      {
+        title,
+        content,
+        todos: validTodos,
+        tags: validTags,
+        folderId: folderId,
+      },
       { new: true }
     );
 
@@ -234,7 +240,7 @@ const deleteNote = async (req, res) => {
     }
 
     // Get the ID of the folder this note belonged to
-    const folderId = deletedNote.folder;
+    const folderId = deletedNote.folderId;
 
     // Remove the note ID from the folder's notes array
     await Folder.findByIdAndUpdate(folderId, {
