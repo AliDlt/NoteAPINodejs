@@ -1,6 +1,7 @@
 const User = require("../models/User");
 
 const dbFunctions = require("../utils/dbFunctions");
+const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const uploadImage = require("../utils/uploadImage");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
@@ -30,7 +31,12 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "the user is already exist", data: false });
     } else {
-      const newUser = await User.create({ fullname, email, password });
+      const hashedPassword = await hashPassword(password);
+      const newUser = await User.create({
+        fullname,
+        email,
+        password: hashedPassword,
+      });
       const folderResult = await dbFunctions.initializeDefaultFolder(
         newUser._id
       );
@@ -77,20 +83,12 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
-    if (user.password !== password) {
+    const passwordsMatch = await comparyePassword(password, user.password);
+    if (!passwordsMatch) {
       return res
         .status(400)
         .json({ message: "Invalid credentials", data: false });
     }
-    // Generate a JWT token with additional claims
-    const token = generateToken(
-      {
-        email,
-        sensitiveInfoChanged: user.isChanged || false,
-      },
-      "30d"
-    );
-
     return res
       .status(200)
       .json({ message: "Login successful", data: { token } });
