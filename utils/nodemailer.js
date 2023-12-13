@@ -47,4 +47,34 @@ async function sendConfirmationEmail(fullname, userEmail, confirmationToken) {
   }
 }
 
-module.exports = { sendConfirmationEmail };
+async function sendResetPassEmail(fullname, userEmail, resetPassToken) {
+  try {
+    const url = `${
+      "http://" + process.env.URL + ":" + process.env.PORT
+    }/api/get-reset-password/${resetPassToken}`;
+
+    const info = await transporter.sendMail({
+      from: "no-reply@alidlt.ir",
+      to: userEmail,
+      subject: "Reset Password",
+      text: `Click the following link to reset your password: ${url}`,
+      html: `<p>Hi ${fullname},</p>
+         <p>Click the following link to reset your password: <a href="${url}">${url}</a></p>
+         <p>If you didn't request this email, please ignore it.</p>
+         <p>Thanks,<br>Your App Team</p>`,
+    });
+    return {
+      status: true,
+      message: "Email sent successfully",
+      info: info,
+    };
+  } catch (error) {
+    throw {
+      status: false,
+      message: "Error sending email",
+      error: error,
+    };
+  }
+}
+
+module.exports = { sendConfirmationEmail, sendResetPassEmail };

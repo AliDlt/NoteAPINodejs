@@ -5,7 +5,11 @@ const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const uploadImage = require("../utils/uploadImage");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
-const { sendConfirmationEmail } = require("../utils/nodemailer");
+
+const {
+  sendConfirmationEmail,
+  sendResetPassEmail,
+} = require("../utils/nodemailer");
 
 const getUser = async (req, res) => {
   try {
@@ -97,25 +101,70 @@ const loginUser = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+const sendResetPassword = async (req, res) => {
   try {
-    const { id, password } = req.body;
+    const { id } = req.body;
     const user = await User.findOne({ id });
+
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
 
-    await User.findOneAndUpdate(
-      { id },
-      { password, isChanged: true },
-      { new: true }
+    const resetPassToken = generateToken({ userId: id }, "1d");
+
+    const sendEmail = await sendConfirmationEmail(
+      user.fullname,
+      user.email,
+      resetPassToken
     );
 
-    return res
-      .status(200)
-      .json({ message: "User successfully changed password", data: true });
+    if (sendEmail.status) {
+      return res.status(201).json({
+        message: "Reset password link sent successfully",
+        data: true,
+      });
+    } else {
+      return res.status(500).json({
+        message: "Error in sending email",
+        data: false,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: error, data: false });
+    res.status(500).json({ message: error.message, data: false });
+  }
+};
+
+const getResetPassword = async (req, res) => {
+  try {
+    const token = req.params.token;
+
+    try {
+      const decodedToken = verifyToken(token);
+
+      if (!decodedToken || !decodedToken.userId) {
+        return res
+          .status(400)
+          .json({ message: "Invalid or expired token", data: false });
+      }
+
+      const userId = decodedToken.userId;
+      const user = await User.findOne({ _id: userId });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found", data: false });
+      }
+
+      return res.status(200).json({ message: "Token is correct", data: true });
+    } catch (verificationError) {
+      if (verificationError.name === "JsonWebTokenError") {
+        return res
+          .status(400)
+          .json({ message: "Invalid token format", data: false });
+      }
+      throw verificationError;
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message, data: false });
   }
 };
 
@@ -207,7 +256,8 @@ module.exports = {
   getUser,
   registerUser,
   loginUser,
-  resetPassword,
+  sendResetPassword,
+  getResetPassword,
   confirmEmail,
   changeUser,
   // uploadProfileImage,

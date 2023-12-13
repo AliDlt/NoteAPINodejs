@@ -8,7 +8,8 @@ const router = new Router();
 router.get("/api/getUser/:id", authController.getUser);
 router.post("/api/register", authController.registerUser);
 router.post("/api/login", authController.loginUser);
-router.post("/api/reset-password", authController.resetPassword);
+router.post("/api/send-reset-password/", authController.sendResetPassword);
+router.get("/api/get-reset-password/:token", authController.getResetPassword);
 router.get("/api/confirm-email/:token", authController.confirmEmail);
 router.post("/api/change-user", authController.changeUser);
 
