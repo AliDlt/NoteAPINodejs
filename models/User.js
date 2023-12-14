@@ -21,9 +21,9 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  isChanged: {
-    type: Boolean,
-    default: false,
+  passwordResetVersion: {
+    type: Number,
+    default: 0,
   },
   profile: {
     type: String,

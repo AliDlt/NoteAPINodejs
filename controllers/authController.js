@@ -87,15 +87,13 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
-    const passwordsMatch = await comparyePassword(password, user.password);
+    const passwordsMatch = await comparePassword(password, user.password);
     if (!passwordsMatch) {
       return res
         .status(400)
         .json({ message: "Invalid credentials", data: false });
     }
-    return res
-      .status(200)
-      .json({ message: "Login successful", data: { token } });
+    return res.status(200).json({ message: "Login successful", data: true });
   } catch (error) {
     res.status(500).json({ message: error, data: false });
   }
@@ -112,7 +110,7 @@ const sendResetPassword = async (req, res) => {
 
     const resetPassToken = generateToken({ userId: id }, "1d");
 
-    const sendEmail = await sendConfirmationEmail(
+    const sendEmail = await sendResetPassEmail(
       user.fullname,
       user.email,
       resetPassToken
@@ -137,31 +135,58 @@ const sendResetPassword = async (req, res) => {
 const getResetPassword = async (req, res) => {
   try {
     const token = req.params.token;
+    const decodedToken = verifyToken(token);
 
-    try {
-      const decodedToken = verifyToken(token);
+    if (!decodedToken || !decodedToken.userId) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired token", data: false });
+    }
 
-      if (!decodedToken || !decodedToken.userId) {
+    const userId = decodedToken.userId;
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", data: false });
+    }
+
+    return res.status(200).json({ message: "Token is correct", data: true });
+  } catch (verificationError) {
+    if (verificationError.name === "JsonWebTokenError") {
+      return res
+        .status(400)
+        .json({ message: "Invalid token format", data: false });
+    } else {
+      return res.status(500).json({ message: error.message, data: false });
+    }
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const password = req.body.password;
+
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", data: false });
+    }
+
+    if (password) {
+      const hashedPassword = await hashPassword(password);
+      const update = await user.updateOne({ password: hashedPassword });
+      if (update) {
         return res
-          .status(400)
-          .json({ message: "Invalid or expired token", data: false });
+          .status(200)
+          .json({ message: "Password changed", data: true });
+      } else {
+        return res.status(400).json({ message: update, data: false });
       }
-
-      const userId = decodedToken.userId;
-      const user = await User.findOne({ _id: userId });
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found", data: false });
-      }
-
-      return res.status(200).json({ message: "Token is correct", data: true });
-    } catch (verificationError) {
-      if (verificationError.name === "JsonWebTokenError") {
-        return res
-          .status(400)
-          .json({ message: "Invalid token format", data: false });
-      }
-      throw verificationError;
+    } else {
+      return res
+        .status(200)
+        .json({ message: "please fill password", data: false });
     }
   } catch (error) {
     res.status(500).json({ message: error.message, data: false });
@@ -225,15 +250,13 @@ const confirmEmail = async (req, res) => {
 
 const changeUser = async (req, res) => {
   try {
-    const { id, fullname, password, email } = req.body;
+    const { id, fullname, email } = req.body;
 
     const updatedUser = await User.findOneAndUpdate(
-      { id },
+      { _id: id },
       {
         fullname,
-        password,
         email,
-        isChanged: true,
       },
       { new: true }
     );
@@ -260,5 +283,6 @@ module.exports = {
   getResetPassword,
   confirmEmail,
   changeUser,
+  changePassword,
   // uploadProfileImage,
 };
