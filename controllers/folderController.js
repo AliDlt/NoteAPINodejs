@@ -4,7 +4,6 @@ const Note = require("../models/Note");
 // Get folder by ID
 const getFolderById = async (req, res) => {
   const folderId = req.params.id;
-
   try {
     const folder = await Folder.findById(folderId);
 
@@ -12,6 +11,15 @@ const getFolderById = async (req, res) => {
       return res
         .status(404)
         .json({ message: "the folder wasn't found", data: null });
+    }
+
+    // Check if the folder belongs to the authenticated user
+    const user = req.user;
+    if (!folder.userId.equals(user._id)) {
+      return res.status(403).json({
+        message: "You do not have permission to access this folder",
+        data: null,
+      });
     }
 
     // Get detailed notes for the folder
@@ -37,7 +45,6 @@ const getFolderById = async (req, res) => {
 // Get Detail Folder
 const getDetailFolder = async (req, res) => {
   const folderId = req.params.id;
-
   try {
     const folder = await Folder.findById(folderId);
 
@@ -45,6 +52,15 @@ const getDetailFolder = async (req, res) => {
       return res
         .status(404)
         .json({ message: "the folder didn't found", data: null });
+    }
+
+    // Check if the folder belongs to the authenticated user
+    const user = req.user;
+    if (!folder.userId.equals(user._id)) {
+      return res.status(403).json({
+        message: "You do not have permission to access this folder",
+        data: null,
+      });
     }
 
     // Get detailed notes for the folder
@@ -70,12 +86,25 @@ const getDetailFolder = async (req, res) => {
 // Get Default Folder
 const getDefaultFolder = async (req, res) => {
   try {
-    const folder = await Folder.findOne({ title: "Default Folder" });
+    const userId = req.user._id;
+    const folder = await Folder.findOne({
+      userId: userId,
+      title: "Default Folder",
+    });
 
     if (!folder) {
       return res
         .status(404)
         .json({ message: "the folder didn't found", data: null });
+    }
+
+    // Check if the folder belongs to the authenticated user
+    const user = req.user;
+    if (!folder.userId.equals(user._id)) {
+      return res.status(403).json({
+        message: "You do not have permission to access this folder",
+        data: null,
+      });
     }
 
     // Get detailed notes for the folder
@@ -98,10 +127,11 @@ const getDefaultFolder = async (req, res) => {
   }
 };
 
-// Get all folders
+// Get all folders by user id
 const getAllFolders = async (req, res) => {
   try {
-    const folders = await Folder.find();
+    const userId = req.user._id;
+    const folders = await Folder.find({ userId: userId });
 
     if (folders != null && folders.length > 0) {
       res.status(200).json({ message: "successful", data: folders });
@@ -118,8 +148,9 @@ const getAllFolders = async (req, res) => {
 // Create a new folder
 const createFolder = async (req, res) => {
   try {
-    const title = req.body;
-    const folder = new Folder(title);
+    const userId = req.user._id;
+    const title = req.body.title;
+    const folder = new Folder({ title, userId });
     await folder.save();
     res.status(200).json({ message: "successful", data: folder });
   } catch (error) {
@@ -136,18 +167,38 @@ const createFolder = async (req, res) => {
 // Update an existing folder by ID
 const updateFolder = async (req, res) => {
   try {
-    const title = req.body;
+    const userId = req.user._id;
+    const title = req.body.title;
     const folderId = req.params.id;
 
-    const updatedFolder = await Folder.findByIdAndUpdate(folderId, title, {
-      new: true,
-    });
+    // Find the folder by ID and check if it belongs to the authenticated user
+    const folder = await Folder.findById(folderId);
+    if (!folder) {
+      return res
+        .status(404)
+        .json({ message: "the folder didn't found", data: null });
+    }
+
+    if (!folder.userId.equals(userId)) {
+      return res.status(403).json({
+        message: "You do not have permission to update this folder",
+        data: null,
+      });
+    }
+
+    // Update the folder
+    const updatedFolder = await Folder.findByIdAndUpdate(
+      folderId,
+      { title },
+      { new: true }
+    );
 
     if (!updatedFolder) {
       return res
         .status(404)
         .json({ message: "the folder didn't found", data: null });
     }
+
     res.status(200).json({ message: "successful", data: updatedFolder });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
@@ -163,8 +214,12 @@ const updateFolder = async (req, res) => {
 // Delete a folder by ID
 const deleteFolder = async (req, res) => {
   try {
+    const userId = req.user._id;
     const folderId = req.params.id;
-    const allNotesFolder = await Folder.findOne({ title: "Default Folder" });
+    const allNotesFolder = await Folder.findOne({
+      userId,
+      title: "Default Folder",
+    });
 
     if (
       allNotesFolder &&
