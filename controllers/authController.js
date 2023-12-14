@@ -3,7 +3,7 @@ const User = require("../models/User");
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const { isPasswordValid } = require("../utils/passwordValidation");
-const uploadImage = require("../utils/uploadImage");
+const uploadImage = require("../utils/uploadImageConfig");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
 
@@ -19,6 +19,11 @@ const getUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
+
+    const url = `${
+      "http://" + process.env.URL + ":" + process.env.PORT
+    }/images/${user.profile}`;
+    user.profile = url;
 
     return res.status(200).json({ message: "successfull", data: user });
   } catch (error) {
@@ -36,6 +41,13 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "the user is already exist", data: false });
     } else {
+      if (!isPasswordValid(password)) {
+        return res.status(400).json({
+          message:
+            "Please fill a valid password. It should be at least 8 characters long and not contain white spaces.",
+          data: false,
+        });
+      }
       const hashedPassword = await hashPassword(password);
       const newUser = await User.create({
         fullname,
@@ -225,37 +237,6 @@ const confirmEmail = async (req, res) => {
   }
 };
 
-// const uploadProfileImage = async (req, res) => {
-//   try {
-//     const _id = req.params.id;
-//     const user = await User.findOne({ _id });
-//     if (!user) {
-//       return res.status(404).json("User not found");
-//     }
-//     const buffer = req.file.buffer;
-//     const path = uploadImage(buffer);
-//     console.log(test);
-//     console.log(path);
-
-//     if (req.file) {
-//       await User.findOneAndUpdate(
-//         { _id },
-//         {
-//           profile: `${path}`,
-//         },
-//         { new: true }
-//       );
-//     } else {
-//       return res.status(400).json("there is no file");
-//     }
-
-//     return res.status(201).json("profile successfully");
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json(error);
-//   }
-// };
-
 const changeUser = async (req, res) => {
   try {
     const { id, fullname, email } = req.body;
@@ -292,5 +273,4 @@ module.exports = {
   confirmEmail,
   changeUser,
   changePassword,
-  // uploadProfileImage,
 };

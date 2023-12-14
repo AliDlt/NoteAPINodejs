@@ -27,6 +27,7 @@ const userSchema = new Schema({
   },
   profile: {
     type: String,
+    default: "profile.jpg",
   },
   folders: [
     {
