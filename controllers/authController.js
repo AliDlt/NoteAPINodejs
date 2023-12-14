@@ -2,6 +2,7 @@ const User = require("../models/User");
 
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
+const { isPasswordValid } = require("../utils/passwordValidation");
 const uploadImage = require("../utils/uploadImage");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
@@ -173,7 +174,7 @@ const changePassword = async (req, res) => {
       return res.status(404).json({ message: "User not found", data: false });
     }
 
-    if (password) {
+    if (isPasswordValid(password)) {
       const hashedPassword = await hashPassword(password);
       const passwordResetVersion = user.passwordResetVersion || 0;
 
@@ -189,9 +190,11 @@ const changePassword = async (req, res) => {
         return res.status(400).json({ message: update, data: false });
       }
     } else {
-      return res
-        .status(200)
-        .json({ message: "please fill password", data: false });
+      return res.status(400).json({
+        message:
+          "Please fill a valid password. It should be at least 8 characters long and not contain white spaces.",
+        data: false,
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message, data: false });
