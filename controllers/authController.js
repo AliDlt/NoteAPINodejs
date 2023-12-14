@@ -175,7 +175,12 @@ const changePassword = async (req, res) => {
 
     if (password) {
       const hashedPassword = await hashPassword(password);
-      const update = await user.updateOne({ password: hashedPassword });
+      const passwordResetVersion = user.passwordResetVersion || 0;
+
+      const update = await user.updateOne({
+        password: hashedPassword,
+        passwordResetVersion: passwordResetVersion + 1,
+      });
       if (update) {
         return res
           .status(200)
