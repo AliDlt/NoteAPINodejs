@@ -11,13 +11,13 @@ const getTagById = async (req, res) => {
     if (!tag) {
       return res
         .status(404)
-        .json({ message: "the tag wasn't found", data: [] });
+        .json({ message: "the tag wasn't found", data: null });
     }
     res.status(200).json(tag);
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -29,12 +29,12 @@ const getAllTags = async (req, res) => {
     if (tags != null && tags.length > 0) {
       res.status(200).json(tags);
     } else {
-      return res.status(404).json({ message: "there is no tag", data: [] });
+      return res.status(404).json({ message: "there is no tag", data: null });
     }
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -48,7 +48,7 @@ const createTag = async (req, res) => {
     if (!note) {
       return res
         .status(404)
-        .json({ message: "The note wasn't found", data: [] });
+        .json({ message: "The note wasn't found", data: null });
     }
 
     const tag = new Tag({ title, noteId });
@@ -60,11 +60,11 @@ const createTag = async (req, res) => {
     res.status(200).json({ message: "Successful", data: tag });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "tag is already exist", data: [] });
+      res.status(400).json({ message: "tag is already exist", data: null });
     } else {
       res
         .status(500)
-        .json({ message: `there is an error: ${error.message}`, data: [] });
+        .json({ message: `there is an error: ${error.message}`, data: null });
     }
   }
 };
@@ -79,7 +79,7 @@ const updateTag = async (req, res) => {
     if (!note) {
       return res
         .status(404)
-        .json({ message: "The note wasn't found", data: [] });
+        .json({ message: "The note wasn't found", data: null });
     }
 
     const tagId = req.params.id;
@@ -92,17 +92,17 @@ const updateTag = async (req, res) => {
     if (!updatedTag) {
       return res
         .status(404)
-        .json({ message: "The tag wasn't found", data: [] });
+        .json({ message: "The tag wasn't found", data: null });
     }
 
     res.status(200).json({ message: "Successful", data: updatedTag });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "tag is already exist", data: [] });
+      res.status(400).json({ message: "tag is already exist", data: null });
     } else {
       res
         .status(500)
-        .json({ message: `there is an error: ${error.message}`, data: [] });
+        .json({ message: `there is an error: ${error.message}`, data: null });
     }
   }
 };
@@ -117,7 +117,7 @@ const deleteTag = async (req, res) => {
     if (!deletedTag) {
       return res
         .status(404)
-        .json({ message: "The tag wasn't found", data: [] });
+        .json({ message: "The tag wasn't found", data: null });
     }
 
     // Get all notes that contain this tag
@@ -134,7 +134,7 @@ const deleteTag = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is and error : ${error}`, data: [] });
+      .json({ message: `there is and error : ${error}`, data: null });
   }
 };
 

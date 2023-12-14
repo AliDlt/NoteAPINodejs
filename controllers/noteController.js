@@ -13,13 +13,13 @@ const getNoteById = async (req, res) => {
     if (!note) {
       return res
         .status(404)
-        .json({ message: "the note wasn't found", data: [] });
+        .json({ message: "the note wasn't found", data: null });
     }
-    res.status(200).json({ message: "successful", data: [] });
+    res.status(200).json({ message: "successful", data: null });
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -36,14 +36,14 @@ const searchNote = async (req, res) => {
     }).select("id title content");
 
     if (!notes || notes.length === 0) {
-      return res.status(404).json({ message: "there is no note", data: [] });
+      return res.status(404).json({ message: "there is no note", data: null });
     }
 
     res.status(200).json({ message: "successful", data: notes });
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -55,12 +55,12 @@ const getAllNotes = async (req, res) => {
     if (notes != null && notes.length > 0) {
       res.status(200).json({ message: "successful", data: notes });
     } else {
-      res.status(404).json({ message: "there is no note", data: [] });
+      res.status(404).json({ message: "there is no note", data: null });
     }
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -73,12 +73,12 @@ const getNotesByFolderId = async (req, res) => {
     if (notes != null && notes.length > 0) {
       res.status(200).json({ message: "successful", data: notes });
     } else {
-      res.status(404).json({ message: "there is no note", data: [] });
+      res.status(404).json({ message: "there is no note", data: null });
     }
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -87,19 +87,21 @@ const createNote = async (req, res) => {
   try {
     var { title, content, todos, folderId, tags } = req.body;
 
-    const validTags = [];
+    const validTags = null;
     // Validate tag IDs
     if (tags != null && tags.length > 0) {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res.status(404).json({ message: "there is no tag", data: [] });
+          return res
+            .status(404)
+            .json({ message: "there is no tag", data: null });
         }
         validTags.push(tagId);
       }
     }
 
-    const validTodos = [];
+    const validTodos = null;
     if (todos != null && todos.length > 0) {
       // Validate todo IDs
       for (let todoId of todos) {
@@ -107,7 +109,7 @@ const createNote = async (req, res) => {
         if (!todoExists) {
           return res
             .status(404)
-            .json({ message: "there is no todo", data: [] });
+            .json({ message: "there is no todo", data: null });
         }
         validTodos.push(todoId);
       }
@@ -123,7 +125,7 @@ const createNote = async (req, res) => {
       if (!defaultFolder) {
         return res.status(404).json({
           message: "there is no default folder",
-          data: [],
+          data: null,
         });
       }
 
@@ -149,7 +151,7 @@ const createNote = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -159,19 +161,21 @@ const updateNote = async (req, res) => {
     var { title, content, todos, folderId, tags } = req.body;
     const noteId = req.params.id;
 
-    const validTags = [];
+    const validTags = null;
     // Validate tag IDs
     if (tags != null && tags.length > 0) {
       for (let tagId of tags) {
         const tagExists = await Tag.exists({ _id: tagId });
         if (!tagExists) {
-          return res.status(404).json({ message: "there is no tag", data: [] });
+          return res
+            .status(404)
+            .json({ message: "there is no tag", data: null });
         }
         validTags.push(tagId);
       }
     }
 
-    const validTodos = [];
+    const validTodos = null;
     if (todos != null && todos.length > 0) {
       // Validate todo IDs
       for (let todoId of todos) {
@@ -179,7 +183,7 @@ const updateNote = async (req, res) => {
         if (!todoExists) {
           return res
             .status(404)
-            .json({ message: "there is no todo", data: [] });
+            .json({ message: "there is no todo", data: null });
         }
         validTodos.push(todoId);
       }
@@ -195,7 +199,7 @@ const updateNote = async (req, res) => {
       if (!defaultFolder) {
         return res.status(404).json({
           message: "there is no default folder",
-          data: [],
+          data: null,
         });
       }
 
@@ -215,7 +219,7 @@ const updateNote = async (req, res) => {
     );
 
     if (!updatedNote) {
-      return res.status(404).json({ message: "there is no note", data: [] });
+      return res.status(404).json({ message: "there is no note", data: null });
     }
 
     await Folder.findByIdAndUpdate(folderId, { $push: { notes: noteId } });
@@ -224,7 +228,7 @@ const updateNote = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -236,7 +240,7 @@ const deleteNote = async (req, res) => {
     const deletedNote = await Note.findByIdAndDelete(noteId);
 
     if (!deletedNote) {
-      return res.status(404).json({ message: "there is no note", data: [] });
+      return res.status(404).json({ message: "there is no note", data: null });
     }
 
     // Get the ID of the folder this note belonged to
@@ -261,7 +265,7 @@ const deleteNote = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 

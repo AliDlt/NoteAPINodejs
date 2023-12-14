@@ -11,7 +11,7 @@ const getFolderById = async (req, res) => {
     if (!folder) {
       return res
         .status(404)
-        .json({ message: "the folder wasn't found", data: [] });
+        .json({ message: "the folder wasn't found", data: null });
     }
 
     // Get detailed notes for the folder
@@ -30,7 +30,7 @@ const getFolderById = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -44,7 +44,7 @@ const getDetailFolder = async (req, res) => {
     if (!folder) {
       return res
         .status(404)
-        .json({ message: "the folder didn't found", data: [] });
+        .json({ message: "the folder didn't found", data: null });
     }
 
     // Get detailed notes for the folder
@@ -63,7 +63,7 @@ const getDetailFolder = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -75,7 +75,7 @@ const getDefaultFolder = async (req, res) => {
     if (!folder) {
       return res
         .status(404)
-        .json({ message: "the folder didn't found", data: [] });
+        .json({ message: "the folder didn't found", data: null });
     }
 
     // Get detailed notes for the folder
@@ -94,7 +94,7 @@ const getDefaultFolder = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: [] });
+      .json({ message: `there is an error: ${error.message}`, data: null });
   }
 };
 
@@ -106,10 +106,12 @@ const getAllFolders = async (req, res) => {
     if (folders != null && folders.length > 0) {
       res.status(200).json({ message: "successful", data: folders });
     } else {
-      res.status(404).json({ message: "the folder didn't found", data: [] });
+      res.status(404).json({ message: "the folder didn't found", data: null });
     }
   } catch (error) {
-    res.status(500).json({ message: `there is an error: ${error}`, data: [] });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error}`, data: null });
   }
 };
 
@@ -122,11 +124,11 @@ const createFolder = async (req, res) => {
     res.status(200).json({ message: "successful", data: folder });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "the folder already exist", data: [] });
+      res.status(400).json({ message: "the folder already exist", data: null });
     } else {
       res
         .status(500)
-        .json({ message: `there is an error:${error.message}`, data: [] });
+        .json({ message: `there is an error:${error.message}`, data: null });
     }
   }
 };
@@ -144,16 +146,16 @@ const updateFolder = async (req, res) => {
     if (!updatedFolder) {
       return res
         .status(404)
-        .json({ message: "the folder didn't found", data: [] });
+        .json({ message: "the folder didn't found", data: null });
     }
     res.status(200).json({ message: "successful", data: updatedFolder });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
-      res.status(400).json({ message: "the folder already exist", data: [] });
+      res.status(400).json({ message: "the folder already exist", data: null });
     } else {
       res
         .status(500)
-        .json({ message: `there is an error :${error.message}`, data: [] });
+        .json({ message: `there is an error :${error.message}`, data: null });
     }
   }
 };
@@ -170,7 +172,7 @@ const deleteFolder = async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ message: "you can not delete default folder", data: [] });
+        .json({ message: "you can not delete default folder", data: null });
     }
 
     const deletedFolder = await Folder.findByIdAndDelete(folderId);
@@ -178,14 +180,14 @@ const deleteFolder = async (req, res) => {
     if (!deletedFolder) {
       return res
         .status(404)
-        .json({ message: "the folder didn't found", data: [] });
+        .json({ message: "the folder didn't found", data: null });
     }
 
-    res.status(200).json({ message: "successful", data: [] });
+    res.status(200).json({ message: "successful", data: null });
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: [] });
+      .json({ message: `there is an error : ${error.message}`, data: null });
   }
 };
 

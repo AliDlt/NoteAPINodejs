@@ -11,7 +11,7 @@ async function initializeDefaultFolder(userId) {
       return { message: "successful", data: existingFolder };
     }
   } catch (error) {
-    return { message: error, data: [] };
+    return { message: error, data: null };
   }
 }
 

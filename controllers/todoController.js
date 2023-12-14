@@ -11,13 +11,13 @@ const getTodoById = async (req, res) => {
     if (!todo) {
       return res
         .status(404)
-        .json({ message: "The todo wasn't found", data: [] });
+        .json({ message: "The todo wasn't found", data: null });
     }
     res.status(200).json({ message: "Successful", data: todo });
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: [] });
+      .json({ message: `there is an error : ${error.message}`, data: null });
   }
 };
 
@@ -29,12 +29,12 @@ const getAllTodos = async (req, res) => {
     if (todos != null && todos.length > 0) {
       res.status(200).json({ message: "Successful", data: todos });
     } else {
-      return res.status(404).json({ message: "There is no todo", data: [] });
+      return res.status(404).json({ message: "There is no todo", data: null });
     }
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: [] });
+      .json({ message: `there is an error : ${error.message}`, data: null });
   }
 };
 
@@ -48,7 +48,7 @@ const createTodo = async (req, res) => {
     if (!note) {
       return res
         .status(404)
-        .json({ message: "The note wasn't found", data: [] });
+        .json({ message: "The note wasn't found", data: null });
     }
 
     const todo = new Todo({ title, noteId, isCompleted });
@@ -61,7 +61,7 @@ const createTodo = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: [] });
+      .json({ message: `there is an error : ${error.message}`, data: null });
   }
 };
 
@@ -75,7 +75,7 @@ const updateTodo = async (req, res) => {
     if (!note) {
       return res
         .status(404)
-        .json({ message: "The note wasn't found", data: [] });
+        .json({ message: "The note wasn't found", data: null });
     }
 
     const todoId = req.params.id;
@@ -88,11 +88,13 @@ const updateTodo = async (req, res) => {
     if (!updatedTodo) {
       return res
         .status(404)
-        .json({ message: "the todo wasn't found", data: [] });
+        .json({ message: "the todo wasn't found", data: null });
     }
     res.status(200).json(updatedTodo);
   } catch (error) {
-    res.status(500).json({ message: `there is an error: ${error}`, data: [] });
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error}`, data: null });
   }
 };
 
@@ -104,9 +106,9 @@ const deleteTodo = async (req, res) => {
     const deletedTodo = await Todo.findByIdAndDelete(todoId);
 
     if (!deletedTodo) {
-      return res
+      return resnull
         .status(404)
-        .json({ message: "the todo wasn't found", data: [] });
+        .json({ message: "the todo wasn't found", data: null });
     }
 
     // Get all notes that contain this tag
@@ -123,7 +125,7 @@ const deleteTodo = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: `there is and error : ${error}`, data: [] });
+      .json({ message: `there is and error : ${error}`, data: null });
   }
 };
 
