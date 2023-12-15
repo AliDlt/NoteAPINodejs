@@ -3,7 +3,6 @@ const User = require("../models/User");
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const { isPasswordValid } = require("../utils/passwordValidation");
-const uploadImage = require("../utils/uploadImageConfig");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
 
@@ -114,14 +113,14 @@ const loginUser = async (req, res) => {
 
 const sendResetPassword = async (req, res) => {
   try {
-    const { id } = req.body;
-    const user = await User.findOne({ id });
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
 
-    const resetPassToken = generateToken({ userId: id }, "1d");
+    const resetPassToken = generateToken({ userId: userId }, "1d");
 
     const sendEmail = await sendResetPassEmail(
       user.fullname,
@@ -148,7 +147,7 @@ const sendResetPassword = async (req, res) => {
 const getResetPassword = async (req, res) => {
   try {
     const token = req.params.token;
-    const decodedToken = verifyToken(token);
+    const decodedToken = await verifyToken(token);
 
     if (!decodedToken || !decodedToken.userId) {
       return res
@@ -216,7 +215,7 @@ const changePassword = async (req, res) => {
 const confirmEmail = async (req, res) => {
   try {
     const token = req.params.token;
-    const decodedToken = verifyToken(token);
+    const decodedToken = await verifyToken(token);
 
     if (!decodedToken || !decodedToken.userId) {
       return res
@@ -231,18 +230,16 @@ const confirmEmail = async (req, res) => {
       .status(200)
       .json({ message: "Account successfully confirmed", data: true });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error confirming account", data: false });
+    return res.status(500).json({ message: error.message, data: false });
   }
 };
 
 const changeUser = async (req, res) => {
   try {
-    const { id, fullname, email } = req.body;
+    const { userId, fullname, email } = req.body;
 
     const updatedUser = await User.findOneAndUpdate(
-      { _id: id },
+      { _id: userId },
       {
         fullname,
         email,
