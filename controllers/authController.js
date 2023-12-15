@@ -53,9 +53,11 @@ const registerUser = async (req, res) => {
         email,
         password: hashedPassword,
       });
+
       const folderResult = await dbFunctions.initializeDefaultFolder(
         newUser._id
       );
+
       if (folderResult.data) {
         newUser.folders.push(folderResult.data._id);
         await newUser.save();
