@@ -15,7 +15,7 @@ const getNoteById = async (req, res) => {
         .status(404)
         .json({ message: "the note wasn't found", data: null });
     }
-    res.status(200).json({ message: "successful", data: null });
+    res.status(200).json({ message: "successful", data: note });
   } catch (error) {
     res
       .status(500)
