@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
-const { isPasswordValid } = require("../utils/passwordValidation");
+// const { isPasswordValid } = require("../utils/passwordValidation");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
 
@@ -40,13 +40,6 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "the user is already exist", data: false });
     } else {
-      if (!isPasswordValid(password)) {
-        return res.status(400).json({
-          message:
-            "Please fill a valid password. It should be at least 8 characters long and not contain white spaces.",
-          data: false,
-        });
-      }
       const hashedPassword = await hashPassword(password);
       const newUser = await User.create({
         fullname,

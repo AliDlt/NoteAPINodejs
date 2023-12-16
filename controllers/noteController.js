@@ -47,22 +47,22 @@ const searchNote = async (req, res) => {
   }
 };
 
-// Get all notes
-const getAllNotes = async (req, res) => {
-  try {
-    const notes = await Note.find();
+// // Get all notes
+// const getAllNotes = async (req, res) => {
+//   try {
+//     const notes = await Note.find();
 
-    if (notes != null && notes.length > 0) {
-      res.status(200).json({ message: "successful", data: notes });
-    } else {
-      res.status(404).json({ message: "there is no note", data: null });
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: null });
-  }
-};
+//     if (notes != null && notes.length > 0) {
+//       res.status(200).json({ message: "successful", data: notes });
+//     } else {
+//       res.status(404).json({ message: "there is no note", data: null });
+//     }
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ message: `there is an error: ${error.message}`, data: null });
+//   }
+// };
 
 //Get all notes by folder
 const getNotesByFolderId = async (req, res) => {
@@ -270,7 +270,7 @@ const deleteNote = async (req, res) => {
 };
 
 module.exports = {
-  getAllNotes,
+  // getAllNotes,
   getNotesByFolderId,
   createNote,
   updateNote,

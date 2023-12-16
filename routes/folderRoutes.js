@@ -3,6 +3,9 @@ const { Router } = require("express");
 const folderController = require("../controllers/folderController");
 
 const checkUserIdAndExistence = require("../middlewares/checkUserIdAndExistence");
+const {
+  validateFolderFields,
+} = require("../middlewares/bodyValidationMiddleware");
 
 const router = new Router();
 
@@ -15,6 +18,7 @@ router.get(
 //Add a new folder
 router.post(
   "/api/addFolder",
+  validateFolderFields,
   checkUserIdAndExistence,
   folderController.createFolder
 );
@@ -39,6 +43,7 @@ router.get(
 //Update folder
 router.put(
   "/api/updateFolder/:id",
+  validateFolderFields,
   checkUserIdAndExistence,
   folderController.updateFolder
 );

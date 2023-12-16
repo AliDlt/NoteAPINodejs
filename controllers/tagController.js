@@ -21,22 +21,22 @@ const getTagById = async (req, res) => {
   }
 };
 
-// Get all tags
-const getAllTags = async (req, res) => {
-  try {
-    const tags = await Tag.find();
+// // Get all tags
+// const getAllTags = async (req, res) => {
+//   try {
+//     const tags = await Tag.find();
 
-    if (tags != null && tags.length > 0) {
-      res.status(200).json(tags);
-    } else {
-      return res.status(404).json({ message: "there is no tag", data: null });
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: null });
-  }
-};
+//     if (tags != null && tags.length > 0) {
+//       res.status(200).json(tags);
+//     } else {
+//       return res.status(404).json({ message: "there is no tag", data: null });
+//     }
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ message: `there is an error: ${error.message}`, data: null });
+//   }
+// };
 
 // Create a new tag
 const createTag = async (req, res) => {
@@ -139,7 +139,7 @@ const deleteTag = async (req, res) => {
 };
 
 module.exports = {
-  getAllTags,
+  // getAllTags,
   createTag,
   updateTag,
   deleteTag,

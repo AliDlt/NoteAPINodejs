@@ -21,22 +21,22 @@ const getTodoById = async (req, res) => {
   }
 };
 
-// Get all todos
-const getAllTodos = async (req, res) => {
-  try {
-    const todos = await Todo.find();
+// // Get all todos
+// const getAllTodos = async (req, res) => {
+//   try {
+//     const todos = await Todo.find();
 
-    if (todos != null && todos.length > 0) {
-      res.status(200).json({ message: "Successful", data: todos });
-    } else {
-      return res.status(404).json({ message: "There is no todo", data: null });
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: null });
-  }
-};
+//     if (todos != null && todos.length > 0) {
+//       res.status(200).json({ message: "Successful", data: todos });
+//     } else {
+//       return res.status(404).json({ message: "There is no todo", data: null });
+//     }
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ message: `there is an error : ${error.message}`, data: null });
+//   }
+// };
 
 // Create a new todo
 const createTodo = async (req, res) => {
@@ -130,7 +130,7 @@ const deleteTodo = async (req, res) => {
 };
 
 module.exports = {
-  getAllTodos,
+  // getAllTodos,
   createTodo,
   updateTodo,
   deleteTodo,

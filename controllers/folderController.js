@@ -150,6 +150,7 @@ const createFolder = async (req, res) => {
   try {
     const userId = req.user._id;
     const title = req.body.title;
+
     const folder = new Folder({ title, userId });
     await folder.save();
     res.status(200).json({ message: "successful", data: folder });
