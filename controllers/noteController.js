@@ -87,7 +87,7 @@ const createNote = async (req, res) => {
   try {
     var { title, content, todos, folderId, tags } = req.body;
 
-    const validTags = null;
+    const validTags = [];
     // Validate tag IDs
     if (tags != null && tags.length > 0) {
       for (let tagId of tags) {
@@ -101,7 +101,7 @@ const createNote = async (req, res) => {
       }
     }
 
-    const validTodos = null;
+    const validTodos = [];
     if (todos != null && todos.length > 0) {
       // Validate todo IDs
       for (let todoId of todos) {
@@ -161,7 +161,7 @@ const updateNote = async (req, res) => {
     var { title, content, todos, folderId, tags } = req.body;
     const noteId = req.params.id;
 
-    const validTags = null;
+    const validTags = [];
     // Validate tag IDs
     if (tags != null && tags.length > 0) {
       for (let tagId of tags) {
@@ -175,7 +175,7 @@ const updateNote = async (req, res) => {
       }
     }
 
-    const validTodos = null;
+    const validTodos = [];
     if (todos != null && todos.length > 0) {
       // Validate todo IDs
       for (let todoId of todos) {
