@@ -13,7 +13,7 @@ const {
 
 const getUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.user._id;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
@@ -108,7 +108,7 @@ const loginUser = async (req, res) => {
 
 const sendResetPassword = async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.user._id;
     const user = await User.findOne({ _id: userId });
 
     if (!user) {
@@ -171,7 +171,7 @@ const getResetPassword = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.user._id;
     const password = req.body.password;
 
     const user = await User.findOne({ _id: userId });
@@ -231,7 +231,8 @@ const confirmEmail = async (req, res) => {
 
 const changeUser = async (req, res) => {
   try {
-    const { userId, fullname, email } = req.body;
+    const userId = req.user._id;
+    const { fullname, email } = req.body;
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },

@@ -3,10 +3,11 @@ const Note = require("../models/Note");
 
 // Get tag by ID
 const getTagById = async (req, res) => {
+  const userId = req.user._id;
   const tagId = req.params.id;
 
   try {
-    const tag = await Tag.findById(tagId);
+    const tag = await Tag.findById({ _id: tagId, userId });
 
     if (!tag) {
       return res
@@ -21,29 +22,33 @@ const getTagById = async (req, res) => {
   }
 };
 
-// // Get all tags
-// const getAllTags = async (req, res) => {
-//   try {
-//     const tags = await Tag.find();
+// Get all tags
+const getAllTags = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
-//     if (tags != null && tags.length > 0) {
-//       res.status(200).json(tags);
-//     } else {
-//       return res.status(404).json({ message: "there is no tag", data: null });
-//     }
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: `there is an error: ${error.message}`, data: null });
-//   }
-// };
+    const tags = await Tag.find({ userId });
+
+    if (tags != null && tags.length > 0) {
+      res.status(200).json({ message: "successful", data: tags });
+    } else {
+      return res.status(404).json({ message: "there is no tag", data: null });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `there is an error: ${error.message}`, data: null });
+  }
+};
 
 // Create a new tag
 const createTag = async (req, res) => {
   try {
+    const userId = req.user._id;
+
     const { title, noteId } = req.body;
 
-    const note = await Note.findById(noteId);
+    const note = await Note.findById({ _id: noteId, userId });
 
     if (!note) {
       return res
@@ -72,9 +77,11 @@ const createTag = async (req, res) => {
 // Update an existing tag by ID
 const updateTag = async (req, res) => {
   try {
+    const userId = req.user._id;
+
     const { title, noteId } = req.body;
 
-    const note = await Note.findById(noteId);
+    const note = await Note.findById({ _id: noteId, userId });
 
     if (!note) {
       return res
@@ -110,9 +117,11 @@ const updateTag = async (req, res) => {
 // Delete a tag by ID
 const deleteTag = async (req, res) => {
   try {
+    const userId = req.user._id;
+
     const tagId = req.params.id;
 
-    const deletedTag = await Tag.findByIdAndDelete(tagId);
+    const deletedTag = await Tag.findByIdAndDelete({ _id: tagId, userId });
 
     if (!deletedTag) {
       return res
@@ -125,9 +134,16 @@ const deleteTag = async (req, res) => {
 
     // Remove the tag ID from the tags array in each note
     for (let note of notesWithTag) {
-      await Note.findByIdAndUpdate(note._id, {
+      const updateNoteResult = await Note.findByIdAndUpdate(note._id, {
         $pull: { tags: tagId },
       });
+
+      if (!updateNoteResult) {
+        // Handle the case where the note update was not successful
+        return res
+          .status(500)
+          .json({ message: "Failed to update note", data: null });
+      }
     }
 
     res.status(200).json({ message: "Successful", data: deletedTag });
@@ -139,7 +155,7 @@ const deleteTag = async (req, res) => {
 };
 
 module.exports = {
-  // getAllTags,
+  getAllTags,
   createTag,
   updateTag,
   deleteTag,

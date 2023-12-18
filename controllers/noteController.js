@@ -6,9 +6,10 @@ const Todo = require("../models/ToDo");
 // Get note by ID
 const getNoteById = async (req, res) => {
   const noteId = req.params.id;
+  const userId = req.user._id;
 
   try {
-    const note = await Note.findById(noteId);
+    const note = await Note.findOne({ userId: userId, _id: noteId });
 
     if (!note) {
       return res
@@ -27,8 +28,10 @@ const getNoteById = async (req, res) => {
 const searchNote = async (req, res) => {
   try {
     const search = req.params.search;
+    const userId = req.user._id;
 
     const notes = await Note.find({
+      userId: userId,
       $or: [
         { title: { $regex: search, $options: "i" } },
         { content: { $regex: search, $options: "i" } },
@@ -47,44 +50,48 @@ const searchNote = async (req, res) => {
   }
 };
 
-// // Get all notes
-// const getAllNotes = async (req, res) => {
-//   try {
-//     const notes = await Note.find();
+// Get all notes
+const getAllNotes = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const notes = await Note.find({ userId });
 
-//     if (notes != null && notes.length > 0) {
-//       res.status(200).json({ message: "successful", data: notes });
-//     } else {
-//       res.status(404).json({ message: "there is no note", data: null });
-//     }
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: `there is an error: ${error.message}`, data: null });
-//   }
-// };
+    if (notes && notes.length > 0) {
+      return res.status(200).json({ message: "Successful", data: notes });
+    }
 
-//Get all notes by folder
+    return res.status(404).json({ message: "No notes found", data: null });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error: ${error.message}`, data: null });
+  }
+};
+
+// Get all notes by folder
 const getNotesByFolderId = async (req, res) => {
   try {
+    const userId = req.user._id;
     const folderId = req.params.id;
-    const notes = await Note.find({ folderId: folderId });
 
-    if (notes != null && notes.length > 0) {
-      res.status(200).json({ message: "successful", data: notes });
-    } else {
-      res.status(404).json({ message: "there is no note", data: null });
+    const notes = await Note.find({ userId, folderId });
+
+    if (notes && notes.length > 0) {
+      return res.status(200).json({ message: "Successful", data: notes });
     }
+
+    return res.status(404).json({ message: "No notes found", data: null });
   } catch (error) {
-    res
+    return res
       .status(500)
-      .json({ message: `there is an error: ${error.message}`, data: null });
+      .json({ message: `Error: ${error.message}`, data: null });
   }
 };
 
 // Create a new note
 const createNote = async (req, res) => {
   try {
+    const userId = req.user._id;
     var { title, content, todos, folderId, tags } = req.body;
 
     const validTags = [];
@@ -133,7 +140,7 @@ const createNote = async (req, res) => {
     }
 
     // Use the specified folderId or find the default folder ("Default Folder")
-    const folderToUse = folderId || ReadableStreamDefaultController._id;
+    const folderToUse = folderId || defaultFolder._id;
 
     const note = new Note({
       title,
@@ -141,6 +148,7 @@ const createNote = async (req, res) => {
       todos: validTodos,
       folderId: folderToUse,
       tags: validTags,
+      userId: userId,
     });
     await note.save();
 
@@ -158,6 +166,7 @@ const createNote = async (req, res) => {
 // Update an existing note by ID
 const updateNote = async (req, res) => {
   try {
+    const userId = req.user._id;
     var { title, content, todos, folderId, tags } = req.body;
     const noteId = req.params.id;
 
@@ -214,6 +223,7 @@ const updateNote = async (req, res) => {
         todos: validTodos,
         tags: validTags,
         folderId: folderId,
+        userId,
       },
       { new: true }
     );
@@ -222,8 +232,15 @@ const updateNote = async (req, res) => {
       return res.status(404).json({ message: "there is no note", data: null });
     }
 
-    await Folder.findByIdAndUpdate(folderId, { $push: { notes: noteId } });
+    const updateFolderResult = await Folder.findByIdAndUpdate(folderId, {
+      $push: { notes: noteId },
+    });
 
+    if (!updateFolderResult) {
+      return res
+        .status(500)
+        .json({ message: "Failed to update folder", data: null });
+    }
     res.status(200).json({ message: "successful", data: updatedNote });
   } catch (error) {
     res
@@ -236,8 +253,8 @@ const updateNote = async (req, res) => {
 const deleteNote = async (req, res) => {
   try {
     const noteId = req.params.id;
-
-    const deletedNote = await Note.findByIdAndDelete(noteId);
+    const userId = req.user._id;
+    const deletedNote = await Note.findOneAndDelete({ _id: noteId, userId });
 
     if (!deletedNote) {
       return res.status(404).json({ message: "there is no note", data: null });
@@ -247,18 +264,32 @@ const deleteNote = async (req, res) => {
     const folderId = deletedNote.folderId;
 
     // Remove the note ID from the folder's notes array
-    await Folder.findByIdAndUpdate(folderId, {
+    const updateFolderResult = await Folder.findByIdAndUpdate(folderId, {
       $pull: { notes: noteId },
     });
+
+    if (!updateFolderResult) {
+      // Handle the case where the folder update was not successful
+      return res
+        .status(500)
+        .json({ message: "Failed to update folder", data: null });
+    }
 
     // Get all todso that contain this note
     const todosWithNote = await Todo.find({ notes: noteId });
 
-    // Remove the note ID from the notes array in each todos
+    // Remove the note ID from the notes array in each todo
     for (let todo of todosWithNote) {
-      await Todo.findByIdAndUpdate(todo, {
+      const updateTodoResult = await Todo.findByIdAndUpdate(todo, {
         $pull: { notes: noteId },
       });
+
+      if (!updateTodoResult) {
+        // Handle the case where the todo update was not successful
+        return res
+          .status(500)
+          .json({ message: "Failed to update todo", data: null });
+      }
     }
 
     res.status(200).json({ message: "successful", data: deletedNote });
@@ -270,7 +301,7 @@ const deleteNote = async (req, res) => {
 };
 
 module.exports = {
-  // getAllNotes,
+  getAllNotes,
   getNotesByFolderId,
   createNote,
   updateNote,

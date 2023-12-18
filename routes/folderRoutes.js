@@ -2,7 +2,7 @@ const { Router } = require("express");
 
 const folderController = require("../controllers/folderController");
 
-const checkUserIdAndExistence = require("../middlewares/checkUserIdAndExistence");
+const checkUserId = require("../middlewares/checkUserIdAndExistence");
 const {
   validateFolderFields,
 } = require("../middlewares/bodyValidationMiddleware");
@@ -10,47 +10,38 @@ const {
 const router = new Router();
 
 //Get all folders of user
-router.get(
-  "/api/getallFolders",
-  checkUserIdAndExistence,
-  folderController.getAllFolders
-);
+router.get("/api/getallFolders", checkUserId, folderController.getAllFolders);
 //Add a new folder
 router.post(
   "/api/addFolder",
+  checkUserId,
   validateFolderFields,
-  checkUserIdAndExistence,
   folderController.createFolder
 );
 //Get folder by id
-router.get(
-  "/api/getFolder/:id",
-  checkUserIdAndExistence,
-  folderController.getFolderById
-);
+router.get("/api/getFolder/:id", folderController.getFolderById);
 //Get folder detail by id
 router.get(
   "/api/getDetailFolder/:id",
-  checkUserIdAndExistence,
   folderController.getDetailFolder
 );
 //Get default folder
 router.get(
   "/api/getDefaultFolder",
-  checkUserIdAndExistence,
+  checkUserId,
   folderController.getDefaultFolder
 );
 //Update folder
 router.put(
   "/api/updateFolder/:id",
   validateFolderFields,
-  checkUserIdAndExistence,
+  checkUserId,
   folderController.updateFolder
 );
 //Delete folder
 router.delete(
   "/api/deleteFolder/:id",
-  checkUserIdAndExistence,
+  checkUserId,
   folderController.deleteFolder
 );
 

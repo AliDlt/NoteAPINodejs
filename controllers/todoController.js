@@ -3,10 +3,11 @@ const Note = require("../models/Note");
 
 // Get todo by ID
 const getTodoById = async (req, res) => {
+  const userId = req.user._id;
   const todoId = req.params.id;
 
   try {
-    const todo = await Todo.findById(todoId);
+    const todo = await Todo.findById({ _id: todoId, userId });
 
     if (!todo) {
       return res
@@ -21,29 +22,31 @@ const getTodoById = async (req, res) => {
   }
 };
 
-// // Get all todos
-// const getAllTodos = async (req, res) => {
-//   try {
-//     const todos = await Todo.find();
+// Get all todos
+const getAllTodos = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const todos = await Todo.find({ userId });
 
-//     if (todos != null && todos.length > 0) {
-//       res.status(200).json({ message: "Successful", data: todos });
-//     } else {
-//       return res.status(404).json({ message: "There is no todo", data: null });
-//     }
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: `there is an error : ${error.message}`, data: null });
-//   }
-// };
+    if (todos != null && todos.length > 0) {
+      res.status(200).json({ message: "Successful", data: todos });
+    } else {
+      return res.status(404).json({ message: "There is no todo", data: null });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `there is an error : ${error.message}`, data: null });
+  }
+};
 
 // Create a new todo
 const createTodo = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { title, noteId, isCompleted } = req.body;
 
-    const note = await Note.findById(noteId);
+    const note = await Note.findById({ _id: noteId, userId });
 
     if (!note) {
       return res
@@ -51,7 +54,7 @@ const createTodo = async (req, res) => {
         .json({ message: "The note wasn't found", data: null });
     }
 
-    const todo = new Todo({ title, noteId, isCompleted });
+    const todo = new Todo({ title, noteId, isCompleted, userId });
     await todo.save();
 
     // Update the Note with the new todoId
@@ -68,9 +71,10 @@ const createTodo = async (req, res) => {
 // Update an existing todo by ID
 const updateTodo = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { title, noteId, isCompleted } = req.body;
 
-    const note = await Note.findById(noteId);
+    const note = await Note.findById({ _id: noteId, userId });
 
     if (!note) {
       return res
@@ -90,7 +94,7 @@ const updateTodo = async (req, res) => {
         .status(404)
         .json({ message: "the todo wasn't found", data: null });
     }
-    res.status(200).json(updatedTodo);
+    res.status(200).json({ message: "Successful", data: updatedTodo });
   } catch (error) {
     res
       .status(500)
@@ -101,9 +105,10 @@ const updateTodo = async (req, res) => {
 // Delete a todo by ID
 const deleteTodo = async (req, res) => {
   try {
+    const userId = req.user._id;
     const todoId = req.params.id;
 
-    const deletedTodo = await Todo.findByIdAndDelete(todoId);
+    const deletedTodo = await Todo.findByIdAndDelete({ _id: todoId, userId });
 
     if (!deletedTodo) {
       return resnull
@@ -116,9 +121,15 @@ const deleteTodo = async (req, res) => {
 
     // Remove the todo ID from the todos array in each note
     for (let note of notesWithTodo) {
-      await Note.findByIdAndUpdate(note._id, {
+      const updateNoteResult = await Note.findByIdAndUpdate(note._id, {
         $pull: { todos: todoId },
       });
+      if (!updateNoteResult) {
+        // Handle the case where the note update was not successful
+        return res
+          .status(500)
+          .json({ message: "Failed to update note", data: null });
+      }
     }
 
     res.status(200).json({ message: "Successful", data: deletedTodo });
@@ -130,7 +141,7 @@ const deleteTodo = async (req, res) => {
 };
 
 module.exports = {
-  // getAllTodos,
+  getAllTodos,
   createTodo,
   updateTodo,
   deleteTodo,

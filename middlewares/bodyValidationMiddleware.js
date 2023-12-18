@@ -56,18 +56,11 @@ function validateNoteFields(req, res, next) {
 
 // Middleware to validate required fields in the request body
 function validateFolderFields(req, res, next) {
-  const { title, userId } = req.body;
+  const { title } = req.body;
 
-  if (!title || !userId) {
+  if (!title) {
     return res.status(400).json({
-      message: "Title and userId are required in the request body",
-      data: null,
-    });
-  }
-
-  if (!isValidObjectId(userId)) {
-    return res.status(400).json({
-      message: "Invalid userId in the request body",
+      message: "Title is required in the request body",
       data: null,
     });
   }
@@ -190,11 +183,11 @@ function validateChangePasswordFields(req, res, next) {
 
 // Middleware to validate required fields in the request body
 function validateChangeUserFields(req, res, next) {
-  const { userId, fullname, email } = req.body;
+  const { fullname, email } = req.body;
 
-  if (!email || !fullname || !userId) {
+  if (!email || !fullname) {
     return res.status(400).json({
-      message: "Email, fullname and userId are required in the request body",
+      message: "Email and fullname are required in the request body",
       data: null,
     });
   }
@@ -202,13 +195,6 @@ function validateChangeUserFields(req, res, next) {
   if (!isValidEmail(email)) {
     return res.status(400).json({
       message: "The email address is not valid",
-      data: null,
-    });
-  }
-
-  if (!isValidObjectId(userId)) {
-    return res.status(400).json({
-      message: "Invalid noteId in the request body",
       data: null,
     });
   }
