@@ -33,6 +33,15 @@ async function verifyToken(token) {
   }
 }
 
+async function verifyUserToken(token) {
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    return decoded;
+  } catch (error) {
+    throw error;
+  }
+}
+
 const isTokenBlacklisted = async (tokenId) => {
   try {
     const count = await Token.countDocuments({ tokenId });
@@ -65,4 +74,5 @@ const addToBlacklist = async (tokenId, userId) => {
 module.exports = {
   generateToken,
   verifyToken,
+  verifyUserToken,
 };

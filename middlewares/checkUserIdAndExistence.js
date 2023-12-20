@@ -1,22 +1,25 @@
 const User = require("../models/User");
 const mongoose = require("mongoose");
 
+const { verifyUserToken } = require("../utils/jwt");
+
 const checkUserIdAndExistence = async (req, res, next) => {
-  const userId = req.header("User-Id");
-
-  if (!userId || userId.trim() === "") {
-    return res
-      .status(400)
-      .json({ message: "the userId is required", data: null });
-  }
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid userId format", data: null });
-  }
-
   try {
+    const token = req.header("token");
+    const decoded = await verifyUserToken(token);
+    const userId = decoded.user._id;
+    if (!userId || userId.trim() === "") {
+      return res
+        .status(400)
+        .json({ message: "the userId is required", data: null });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid userId format", data: null });
+    }
+
     const user = await User.findById(userId);
 
     if (!user) {

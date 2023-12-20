@@ -2,7 +2,6 @@ const User = require("../models/User");
 
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
-// const { isPasswordValid } = require("../utils/passwordValidation");
 
 const { generateToken, verifyToken } = require("../utils/jwt");
 
@@ -15,6 +14,7 @@ const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
@@ -24,7 +24,9 @@ const getUser = async (req, res) => {
     }/images/${user.profile}`;
     user.profile = url;
 
-    return res.status(200).json({ message: "successfull", data: user });
+    const token = generateToken({ user }, "365d");
+
+    return res.status(200).json({ message: "successfull", data: token });
   } catch (error) {
     res.status(500).json({ message: error, data: false });
   }
@@ -100,7 +102,9 @@ const loginUser = async (req, res) => {
         .status(400)
         .json({ message: "Invalid credentials", data: false });
     }
-    return res.status(200).json({ message: "Login successful", data: user });
+    const token = generateToken({ user }, "365d");
+
+    return res.status(200).json({ message: "Login successful", data: token });
   } catch (error) {
     res.status(500).json({ message: error, data: false });
   }
@@ -249,9 +253,10 @@ const changeUser = async (req, res) => {
         .json({ message: "the user didn't found", data: false });
     }
 
+    const token = generateToken({ updatedUser }, "365d");
     return res
       .status(200)
-      .json({ message: "user successfully changed", data: true });
+      .json({ message: "user successfully changed", data: token });
   } catch (error) {
     res.status(500).json({ message: error, data: false });
   }
