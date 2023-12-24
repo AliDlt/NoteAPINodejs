@@ -45,10 +45,10 @@ app.use(tagRoute);
 app.use(authRoute);
 app.use(uploadRoute);
 
-// // Handle 404
-// app.get("*", function (req, res) {
-//   res.status(404).json("Not found");
-// });
+// Handle 404
+app.get("*", function (req, res) {
+  res.status(404).json("Not found");
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
