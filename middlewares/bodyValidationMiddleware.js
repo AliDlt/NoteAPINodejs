@@ -19,11 +19,11 @@ function isPasswordValid(password) {
 
 // Middleware to validate required fields in the request body
 function validateNoteFields(req, res, next) {
-  const { title, content, todos, folderId, tags } = req.body;
+  const { title, todos, folderId, tags } = req.body;
 
-  if (!title || !content || !folderId) {
+  if (!title || !folderId) {
     return res.status(400).json({
-      message: "Title, content and folderId are required in the request body",
+      message: "Title and folderId are required in the request body",
       data: null,
     });
   }
