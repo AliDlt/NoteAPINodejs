@@ -91,20 +91,22 @@ function validateTagFields(req, res, next) {
 
 // Middleware to validate required fields in the request body
 function validateTodoFields(req, res, next) {
-  const { title, isCompleted, noteId } = req.body;
+  const { title, noteId } = req.body;
 
-  if (!title || !noteId || !isCompleted) {
+  if (!title) {
     return res.status(400).json({
-      message: "Title, isCompleted and noteId are required in the request body",
+      message: "Title is required in the request body",
       data: null,
     });
   }
 
-  if (!isValidObjectId(noteId)) {
-    return res.status(400).json({
-      message: "Invalid noteId in the request body",
-      data: null,
-    });
+  if (noteId !== undefined && !noteId !== null) {
+    if (!isValidObjectId(noteId)) {
+      return res.status(400).json({
+        message: "Invalid noteId in the request body",
+        data: null,
+      });
+    }
   }
 
   next();

@@ -46,25 +46,38 @@ const createTodo = async (req, res) => {
     const userId = req.user._id;
     const { title, noteId, isCompleted } = req.body;
 
-    const note = await Note.findById({ _id: noteId, userId });
+    // Use a consistent naming convention for clarity
+    const defaultIsCompleted = isCompleted !== undefined ? isCompleted : false;
 
-    if (!note) {
-      return res
-        .status(404)
-        .json({ message: "The note wasn't found", data: null });
+    if (noteId) {
+      const note = await Note.findById({ _id: noteId, userId });
+
+      if (!note) {
+        return res
+          .status(404)
+          .json({ message: "The note wasn't found", data: null });
+      }
     }
 
-    const todo = new Todo({ title, noteId, isCompleted, userId });
+    const todo = new Todo({
+      title,
+      noteId,
+      isCompleted: defaultIsCompleted,
+      userId,
+    });
     await todo.save();
 
-    // Update the Note with the new todoId
-    await Note.findByIdAndUpdate(noteId, { $push: { todos: todo._id } });
-
+    if (noteId) {
+      // Update the Note with the new todoId
+      await Note.findByIdAndUpdate(noteId, { $push: { todos: todo._id } });
+    }
     res.status(201).json({ message: "Successful", data: todo });
   } catch (error) {
+    // Log the error details for better debugging
+    console.error(`Error creating todo: ${error.message}`);
     res
       .status(500)
-      .json({ message: `there is an error : ${error.message}`, data: null });
+      .json({ message: `There is an error: ${error.message}`, data: null });
   }
 };
 
@@ -74,18 +87,23 @@ const updateTodo = async (req, res) => {
     const userId = req.user._id;
     const { title, noteId, isCompleted } = req.body;
 
-    const note = await Note.findById({ _id: noteId, userId });
+    // Use a consistent naming convention for clarity
+    const defaultIsCompleted = isCompleted !== undefined ? isCompleted : false;
 
-    if (!note) {
-      return res
-        .status(404)
-        .json({ message: "The note wasn't found", data: null });
+    if (noteId) {
+      const note = await Note.findById({ _id: noteId, userId });
+
+      if (!note) {
+        return res
+          .status(404)
+          .json({ message: "The note wasn't found", data: null });
+      }
     }
 
     const todoId = req.params.id;
     const updatedTodo = await Todo.findByIdAndUpdate(
       todoId,
-      { title, noteId, isCompleted },
+      { title, noteId, isCompleted: defaultIsCompleted },
       { new: true }
     );
 

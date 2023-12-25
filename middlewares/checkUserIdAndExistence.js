@@ -6,8 +6,16 @@ const { verifyUserToken } = require("../utils/jwt");
 const checkUserIdAndExistence = async (req, res, next) => {
   try {
     const token = req.header("token");
+
+    if (token === null || token === undefined) {
+      return res
+        .status(400)
+        .json({ message: "the token is required in header", data: null });
+    }
+
     const decoded = await verifyUserToken(token);
     const userId = decoded.user._id;
+
     if (!userId || userId.trim() === "") {
       return res
         .status(400)
