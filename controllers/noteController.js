@@ -88,6 +88,42 @@ const getNotesByFolderId = async (req, res) => {
   }
 };
 
+// Get all notes by folder with pagination
+const getLimitedNotesByFolderId = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const folderId = req.params.id;
+    const page = parseInt(req.query.page) || 1;
+    const amount = parseInt(req.query.amount) || 10;
+
+    const skip = (page - 1) * amount;
+
+    const totalNotes = await Note.countDocuments({ userId, folderId });
+    const totalPages = Math.ceil(totalNotes / amount);
+
+    const notes = await Note.find({ userId, folderId })
+      .skip(skip)
+      .limit(amount);
+
+    if (notes && notes.length > 0) {
+      return res.status(200).json({
+        message: "Successful",
+        data: {
+          notes,
+          totalNotes,
+          totalPages,
+        },
+      });
+    }
+
+    return res.status(404).json({ message: "No notes found", data: null });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error: ${error.message}`, data: null });
+  }
+};
+
 // Create a new note
 const createNote = async (req, res) => {
   try {
@@ -303,6 +339,7 @@ const deleteNote = async (req, res) => {
 module.exports = {
   getAllNotes,
   getNotesByFolderId,
+  getLimitedNotesByFolderId,
   createNote,
   updateNote,
   deleteNote,

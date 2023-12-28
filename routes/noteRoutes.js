@@ -128,6 +128,39 @@ router.get(
 
 /**
  * @swagger
+ * /api/getLimitedNotesByFolderId/{id}:
+ *   get:
+ *     summary: Get notes by folder ID
+ *     tags: [Notes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Folder ID
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Folder not found
+ */
+router.get(
+  "/api/getLimitedNotesByFolderId/:id",
+  checkUserId,
+  noteController.getLimitedNotesByFolderId
+);
+
+/**
+ * @swagger
  * /api/addNote:
  *   post:
  *     summary: Add a new note

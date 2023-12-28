@@ -102,6 +102,13 @@ const loginUser = async (req, res) => {
         .status(400)
         .json({ message: "Invalid credentials", data: false });
     }
+    
+    const url = `${
+      "http://" + process.env.URL + ":" + process.env.PORT
+    }/images/${user.profile}`;
+
+    user.profile = url;
+
     const token = generateToken({ user }, "365d");
 
     return res.status(200).json({ message: "Login successful", data: token });

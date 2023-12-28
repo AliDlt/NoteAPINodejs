@@ -69,7 +69,7 @@ const getImage = async (req, res) => {
       const url = `${
         "http://" + process.env.URL + ":" + process.env.PORT
       }/images/${image}`;
-      return res.status(200).json({ message: "successfull", data: url });
+      return res.status(200).json({ message: "successful", data: url });
     } else {
       return res.status(404).json({ message: "no image", data: null });
     }
