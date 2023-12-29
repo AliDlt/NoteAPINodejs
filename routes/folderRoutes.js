@@ -94,7 +94,7 @@ router.post(
  *       404:
  *         description: Folder not found
  */
-router.get("/api/getFolder/:id", folderController.getFolderById);
+router.get("/api/getFolder/:id", checkUserId, folderController.getFolderById);
 
 /**
  * @swagger
@@ -115,7 +115,11 @@ router.get("/api/getFolder/:id", folderController.getFolderById);
  *       404:
  *         description: Folder not found
  */
-router.get("/api/getDetailFolder/:id", folderController.getDetailFolder);
+router.get(
+  "/api/getDetailFolder/:id",
+  checkUserId,
+  folderController.getDetailFolder
+);
 
 /**
  * @swagger
