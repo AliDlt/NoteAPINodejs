@@ -57,7 +57,7 @@ const registerUser = async (req, res) => {
         newUser.folders.push(folderResult.data._id);
         await newUser.save();
 
-        const confirmationToken = generateToken({ userId: newUser._id }, "1d");
+        const confirmationToken = generateToken({ user: newUser }, "1d");
 
         const sendEmail = await sendConfirmationEmail(
           fullname,
@@ -102,7 +102,7 @@ const loginUser = async (req, res) => {
         .status(400)
         .json({ message: "Invalid credentials", data: false });
     }
-    
+
     const url = `${
       "http://" + process.env.URL + ":" + process.env.PORT
     }/images/${user.profile}`;
@@ -119,14 +119,14 @@ const loginUser = async (req, res) => {
 
 const sendResetPassword = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const user = await User.findOne({ _id: userId });
+    const email = req.body.email;
+    const user = await User.findOne({ email: email });
 
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });
     }
 
-    const resetPassToken = generateToken({ userId: userId }, "1d");
+    const resetPassToken = generateToken({ user: user }, "1d");
 
     const sendEmail = await sendResetPassEmail(
       user.fullname,

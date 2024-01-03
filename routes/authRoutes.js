@@ -120,11 +120,7 @@ router.post(
  *       404:
  *         description: User not found
  */
-router.post(
-  "/api/send-reset-password/",
-  checkUserId,
-  authController.sendResetPassword
-);
+router.post("/api/send-reset-password/", authController.sendResetPassword);
 
 /**
  * @swagger
