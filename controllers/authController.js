@@ -182,10 +182,10 @@ const getResetPassword = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const password = req.body.password;
+    const email = req.body.email;
+    const password = req.body.newPassword;
 
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "User not found", data: false });

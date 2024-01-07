@@ -164,11 +164,12 @@ function validateLoginFields(req, res, next) {
 
 // Middleware to validate required fields in the request body
 function validateChangePasswordFields(req, res, next) {
-  const { password } = req.body;
+  const { email, newPassword } = req.body;
 
-  if (!password) {
+  if (!email || !newPassword) {
     return res.status(400).json({
-      message: "Password are required in the request body",
+      message:
+        "email, oldPassword and newPassword are required in the request body",
       data: null,
     });
   }
