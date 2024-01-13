@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 const dbFunctions = require("../utils/dbFunctions");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
-
+const { isPasswordValid } = require("../middlewares/bodyValidationMiddleware");
 const { generateToken, verifyToken } = require("../utils/jwt");
 
 const {
@@ -26,7 +26,7 @@ const getUser = async (req, res) => {
 
     const token = generateToken({ user }, "365d");
 
-    return res.status(200).json({ message: "successfull", data: token });
+    return res.status(200).json({ message: "successful", data: token });
   } catch (error) {
     res.status(500).json({ message: error, data: false });
   }
@@ -204,7 +204,9 @@ const changePassword = async (req, res) => {
           .status(200)
           .json({ message: "Password changed", data: true });
       } else {
-        return res.status(400).json({ message: update, data: false });
+        return res
+          .status(400)
+          .json({ message: "change password got an error", data: false });
       }
     } else {
       return res.status(400).json({

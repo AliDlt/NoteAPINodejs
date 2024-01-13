@@ -168,8 +168,7 @@ function validateChangePasswordFields(req, res, next) {
 
   if (!email || !newPassword) {
     return res.status(400).json({
-      message:
-        "email, oldPassword and newPassword are required in the request body",
+      message: "email and newPassword are required in the request body",
       data: null,
     });
   }
@@ -214,4 +213,5 @@ module.exports = {
   validateLoginFields,
   validateChangePasswordFields,
   validateChangeUserFields,
+  isPasswordValid,
 };
