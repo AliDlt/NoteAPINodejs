@@ -72,14 +72,14 @@ function validateFolderFields(req, res, next) {
 function validateTagFields(req, res, next) {
   const { title, noteId } = req.body;
 
-  if (!title || !noteId) {
+  if (!title) {
     return res.status(400).json({
-      message: "Title and noteId are required in the request body",
+      message: "Title is required in the request body",
       data: null,
     });
   }
 
-  if (!isValidObjectId(noteId)) {
+  if (noteId && !isValidObjectId(noteId)) {
     return res.status(400).json({
       message: "Invalid noteId in the request body",
       data: null,

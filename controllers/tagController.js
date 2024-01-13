@@ -48,20 +48,22 @@ const createTag = async (req, res) => {
 
     const { title, noteId } = req.body;
 
-    const note = await Note.findById({ _id: noteId, userId });
-
-    if (!note) {
-      return res
-        .status(404)
-        .json({ message: "The note wasn't found", data: null });
+    let tag;
+    if (noteId) {
+      const note = await Note.findById({ _id: noteId, userId });
+      if (!note) {
+        return res
+          .status(404)
+          .json({ message: "The note wasn't found", data: null });
+      }
+      tag = new Tag({ title, noteId });
+      await tag.save();
+      // Update the Note with the new todoId
+      await Note.findByIdAndUpdate(noteId, { $push: { tags: tag._id } });
+    } else {
+      tag = new Tag({ title });
+      await tag.save();
     }
-
-    const tag = new Tag({ title, noteId });
-    await tag.save();
-
-    // Update the Note with the new todoId
-    await Note.findByIdAndUpdate(noteId, { $push: { tags: tag._id } });
-
     res.status(200).json({ message: "Successful", data: tag });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern.title) {
@@ -79,27 +81,31 @@ const updateTag = async (req, res) => {
   try {
     const userId = req.user._id;
 
+    const tagId = req.params.id;
     const { title, noteId } = req.body;
 
-    const note = await Note.findById({ _id: noteId, userId });
-
-    if (!note) {
-      return res
-        .status(404)
-        .json({ message: "The note wasn't found", data: null });
+    if (noteId) {
+      const note = await Note.findById({ _id: noteId, userId });
+      if (!note) {
+        return res
+          .status(404)
+          .json({ message: "The note wasn't found", data: null });
+      }
     }
 
-    const tagId = req.params.id;
-    const updatedTag = await Tag.findByIdAndUpdate(
-      tagId,
-      { title },
-      { new: true }
-    );
+    const updateFields = { title };
+    if (noteId) {
+      updateFields.noteId = noteId;
+    }
+
+    const updatedTag = await Tag.findByIdAndUpdate(tagId, updateFields, {
+      new: true,
+    });
 
     if (!updatedTag) {
       return res
         .status(404)
-        .json({ message: "The tag wasn't found", data: null });
+        .json({ message: "error in updating tag", data: null });
     }
 
     res.status(200).json({ message: "Successful", data: updatedTag });
@@ -132,13 +138,13 @@ const deleteTag = async (req, res) => {
     // Get all notes that contain this tag
     const notesWithTag = await Note.find({ tags: tagId });
 
-    // Remove the tag ID from the tags array in each note
     for (let note of notesWithTag) {
-      const updateNoteResult = await Note.findByIdAndUpdate(note._id, {
-        $pull: { tags: tagId },
-      });
-
-      if (!updateNoteResult) {
+      try {
+        // Remove the tag ID from the tags array in each note
+        await Note.findByIdAndUpdate(note._id, {
+          $pull: { tags: tagId },
+        });
+      } catch (noteUpdateError) {
         // Handle the case where the note update was not successful
         return res
           .status(500)
